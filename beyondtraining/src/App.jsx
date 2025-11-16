@@ -41,12 +41,56 @@ const POSICOES = [
   "Guarda-redes (Guardião)",
 ];
 
+const BASE_STATS_POR_POSICAO = {
+  "Médio Ofensivo (Maestro)": {
+    remate: 5,
+    passe: 7,
+    drible: 7,
+    velocidade: 5,
+    resistencia: 5,
+    compostura: 6,
+  },
+  "Avançado Centro (Matador)": {
+    remate: 8,
+    passe: 4,
+    drible: 5,
+    velocidade: 6,
+    resistencia: 5,
+    compostura: 5,
+  },
+  "Defesa Central (Muralha)": {
+    remate: 3,
+    passe: 4,
+    drible: 3,
+    velocidade: 4,
+    resistencia: 7,
+    compostura: 7,
+  },
+  "Guarda-redes (Guardião)": {
+    remate: 2,
+    passe: 4,
+    drible: 2,
+    velocidade: 4,
+    resistencia: 7,
+    compostura: 8,
+  },
+  default: {
+    remate: 4,
+    passe: 4,
+    drible: 4,
+    velocidade: 4,
+    resistencia: 4,
+    compostura: 4,
+  },
+};
+
 function criarJogadorInicial(formData) {
-  // valores base
+  const baseStats =
+    BASE_STATS_POR_POSICAO[formData.position] || BASE_STATS_POR_POSICAO.default;
+
   let morale = 50;
   let stamina = 80;
 
-  // pequenos bónus conforme a backstory (por enquanto só mexemos nestes dois)
   switch (formData.backstory) {
     case "diamante":
       morale += 10;
@@ -74,6 +118,7 @@ function criarJogadorInicial(formData) {
     backstory: formData.backstory,
     morale: clamp(morale, 0, 100),
     stamina: clamp(stamina, 0, 100),
+    attributes: { ...baseStats },
   };
 }
 
@@ -90,14 +135,30 @@ function App() {
   });
 
   const [player, setPlayer] = useState(null);
+  const [lastTestResult, setLastTestResult] = useState(null);
 
   const scene = scenes[currentSceneId];
 
   const handleOptionClick = (option) => {
-    if (!player) return; // segurança, não deve acontecer
+    if (!player) return;
+
+    let testResult = null;
+
+    if (option.test) {
+      testResult = runTest(option.test, player);
+      setLastTestResult({
+        ...testResult,
+        description: option.test.description || "Lance importante",
+        attribute: option.test.attribute,
+      });
+    } else {
+      setLastTestResult(null);
+    }
 
     setPlayer((prev) => {
-      if (option.reset) return prev; // mais tarde podemos usar isto para reset total
+      if (!prev) return prev;
+
+      if (option.reset) return prev;
 
       const effects = option.effects || {};
       const morale = clamp(prev.morale + (effects.morale ?? 0), 0, 100);
@@ -106,7 +167,17 @@ function App() {
       return { ...prev, morale, stamina };
     });
 
-    setCurrentSceneId(option.next);
+    let nextId = option.next ?? currentSceneId;
+
+    if (option.test && testResult) {
+      if (testResult.success) {
+        nextId = option.nextOnSuccess ?? option.next ?? currentSceneId;
+      } else {
+        nextId = option.nextOnFailure ?? option.next ?? currentSceneId;
+      }
+    }
+
+    setCurrentSceneId(nextId);
   };
 
   const handleFormChange = (event) => {
@@ -210,7 +281,9 @@ function App() {
                     <label
                       key={b.id}
                       className={`backstory-card ${
-                        formData.backstory === b.id ? "backstory-card--active" : ""
+                        formData.backstory === b.id
+                          ? "backstory-card--active"
+                          : ""
                       }`}
                     >
                       <input
@@ -262,6 +335,28 @@ function App() {
                     "N/A"
                   }
                 </p>
+
+                <hr className="sidebar-divider" />
+
+                <h3>Atributos</h3>
+                <p>
+                  <strong>Remate:</strong> {player.attributes.remate}
+                </p>
+                <p>
+                  <strong>Passe:</strong> {player.attributes.passe}
+                </p>
+                <p>
+                  <strong>Drible:</strong> {player.attributes.drible}
+                </p>
+                <p>
+                  <strong>Velocidade:</strong> {player.attributes.velocidade}
+                </p>
+                <p>
+                  <strong>Resistência:</strong> {player.attributes.resistencia}
+                </p>
+                <p>
+                  <strong>Compostura:</strong> {player.attributes.compostura}
+                </p>
               </>
             )}
           </aside>
@@ -269,6 +364,34 @@ function App() {
           <section className="story">
             <h2>{scene.title}</h2>
             <p className="story-text">{scene.text}</p>
+
+            {lastTestResult && (
+              <div
+                className={`test-result ${
+                  lastTestResult.success
+                    ? "test-result--success"
+                    : "test-result--fail"
+                }`}
+              >
+                <p>
+                  <strong>{lastTestResult.description}</strong>
+                </p>
+                <p>
+                  d20: {lastTestResult.roll} + atributo (
+                  {lastTestResult.attributeValue}) ={" "}
+                  {lastTestResult.total}
+                </p>
+                <p>
+                  {lastTestResult.isCritSuccess
+                    ? "Sucesso crítico!"
+                    : lastTestResult.isCritFail
+                    ? "Falha crítica..."
+                    : lastTestResult.success
+                    ? "Jogada bem sucedida."
+                    : "Jogada falhada."}
+                </p>
+              </div>
+            )}
 
             <div className="options">
               {scene.options.map((option) => (
@@ -286,6 +409,18 @@ function App() {
       )}
     </div>
   );
+}
+
+function runTest(test, player) {
+  const roll = Math.floor(Math.random() * 20) + 1;
+  const attrName = test.attribute;
+  const attributeValue = player.attributes?.[attrName] ?? 0;
+  const total = roll + attributeValue;
+  const success = total >= test.dc;
+  const isCritSuccess = roll === 20;
+  const isCritFail = roll === 1;
+
+  return { roll, total, attributeValue, success, isCritSuccess, isCritFail };
 }
 
 function clamp(value, min, max) {

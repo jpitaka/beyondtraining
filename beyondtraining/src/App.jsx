@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 import { scenes } from "./scenes";
+
+const STORAGE_KEY = "beyondtraining_save_v1";
 
 const BACKSTORIES = [
   {
@@ -123,7 +125,8 @@ function criarJogadorInicial(formData) {
 }
 
 function App() {
-  const [screen, setScreen] = useState("characterCreation"); // 'characterCreation' | 'weekHub' | 'game'
+  // 'characterCreation' | 'weekHub' | 'game'
+  const [screen, setScreen] = useState("characterCreation");
   const [currentSceneId, setCurrentSceneId] = useState("inicio");
   const [week, setWeek] = useState(1);
 
@@ -140,10 +143,50 @@ function App() {
 
   const scene = scenes[currentSceneId];
 
+  // 1) Carregar jogo guardado (se existir) quando a app arranca
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+
+      const data = JSON.parse(raw);
+      if (!data.player) return;
+
+      setPlayer(data.player);
+      setScreen(data.screen || "weekHub");
+      setCurrentSceneId(data.currentSceneId || "inicio");
+      setWeek(data.week || 1);
+      setLastTestResult(null);
+    } catch (err) {
+      console.warn("Falha a carregar save:", err);
+    }
+  }, []);
+
+  // 2) Guardar jogo sempre que coisas importantes mudam
+  useEffect(() => {
+    if (!player) {
+      localStorage.removeItem(STORAGE_KEY);
+      return;
+    }
+
+    const data = {
+      player,
+      screen,
+      currentSceneId,
+      week,
+    };
+
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (err) {
+      console.warn("Falha a guardar save:", err);
+    }
+  }, [player, screen, currentSceneId, week]);
+
   const handleOptionClick = (option) => {
     if (!player) return;
 
-    // opção para sair do jogo e voltar à semana seguinte
+    // sair do jogo e voltar ao hub da semana
     if (option.goToWeekHub) {
       setLastTestResult(null);
       setWeek((prev) => prev + 1);
@@ -221,18 +264,15 @@ function App() {
       };
 
       if (type === "fisico") {
-        // treino físico intenso
         updated.stamina = clamp(prev.stamina + 10, 0, 100);
         updated.morale = clamp(prev.morale - 5, 0, 100);
         updated.attributes.resistencia = (prev.attributes.resistencia || 0) + 1;
       } else if (type === "tecnico") {
-        // treino técnico leve
         updated.stamina = clamp(prev.stamina - 5, 0, 100);
         updated.morale = clamp(prev.morale + 5, 0, 100);
         updated.attributes.remate = (prev.attributes.remate || 0) + 1;
         updated.attributes.passe = (prev.attributes.passe || 0) + 1;
       } else if (type === "descanso") {
-        // foco em descanso e recuperação
         updated.stamina = clamp(prev.stamina + 15, 0, 100);
         updated.morale = clamp(prev.morale + 5, 0, 100);
       }
@@ -245,18 +285,46 @@ function App() {
     setScreen("game");
   };
 
+  const handleResetCareer = () => {
+    if (!confirm("Tens a certeza que queres começar uma nova carreira?")) {
+      return;
+    }
+
+    localStorage.removeItem(STORAGE_KEY);
+    setPlayer(null);
+    setScreen("characterCreation");
+    setCurrentSceneId("inicio");
+    setWeek(1);
+    setLastTestResult(null);
+    setFormData({
+      name: "",
+      nickname: "",
+      position: POSICOES[0],
+      club: "Clube Continental",
+      backstory: "diamante",
+    });
+  };
+
   return (
     <div className="app">
       <header className="header">
         <h1>Beyondtraining</h1>
 
-        {player && (
-          <div className="status-bar">
-            <span>Semana: {week}</span>
-            <span>Condição Física: {player.stamina}</span>
-            <span>Moral: {player.morale}</span>
-          </div>
-        )}
+        <div className="header-right">
+          {player && (
+            <div className="status-bar">
+              <span>Semana: {week}</span>
+              <span>Condição Física: {player.stamina}</span>
+              <span>Moral: {player.morale}</span>
+            </div>
+          )}
+
+          {player && (
+            <button className="reset-button" onClick={handleResetCareer}>
+              Nova carreira
+            </button>
+          )}
+        </div>
       </header>
 
       {screen === "characterCreation" ? (
@@ -386,8 +454,9 @@ function App() {
               >
                 <h3>Treino físico intenso</h3>
                 <p>
-                  Corridas, trabalho de força e resistência. Ficas mais preparado
-                  para aguentar o jogo, mas chegas um pouco mais carregado.
+                  Corridas, trabalho de força e resistência. Ficas mais
+                  preparado para aguentar o jogo, mas chegas um pouco mais
+                  carregado.
                 </p>
                 <p className="effects-text">
                   + Resistência, + CF, - um pouco de Moral
@@ -400,8 +469,8 @@ function App() {
               >
                 <h3>Treino técnico</h3>
                 <p>
-                  Finalização, passes em espaços curtos, combinações. Menos carga
-                  física, mais foco na bola.
+                  Finalização, passes em espaços curtos, combinações. Menos
+                  carga física, mais foco na bola.
                 </p>
                 <p className="effects-text">
                   + Remate, + Passe, - um pouco de CF, + Moral
@@ -414,8 +483,8 @@ function App() {
               >
                 <h3>Recuperação e descanso</h3>
                 <p>
-                  Sessões leves, massagem, gelo e foco em dormir bem. Chegas mais
-                  fresco, mas não evoluis tanto.
+                  Sessões leves, massagem, gelo e foco em dormir bem. Chegas
+                  mais fresco, mas não evoluis tanto.
                 </p>
                 <p className="effects-text">
                   ++ CF, + Moral, sem aumento directo de atributos

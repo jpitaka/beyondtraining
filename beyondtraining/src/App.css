@@ -32,6 +32,31 @@ body {
   text-transform: uppercase;
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.reset-button {
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid #374151;
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+.reset-button:hover {
+  border-color: #ef4444;
+  color: #fecaca;
+}
+
+
 .status-bar {
   display: flex;
   gap: 1rem;

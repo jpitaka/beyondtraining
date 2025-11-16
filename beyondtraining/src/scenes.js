@@ -111,14 +111,14 @@ export const scenes = {
     ],
   },
 
-  fim_demo: {
-    title: "Fim da mini-demo",
-    text: "Aqui acaba esta primeira demo. O resto da história de Beyondtraining ainda está por escrever ✍️",
+    fim_demo: {
+    title: "Fim do jogo",
+    text: "O árbitro apita para o final. Mais uma página escrita na tua carreira. Amanhã já se pensa na próxima semana.",
     options: [
       {
-        id: "recomecar",
-        label: "Recomeçar no balneário.",
-        next: "inicio",
+        id: "ir_para_semana",
+        label: "Ir para a semana seguinte.",
+        goToWeekHub: true,
       },
     ],
   },

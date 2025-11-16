@@ -72,6 +72,58 @@ body {
   letter-spacing: 0.08em;
   color: #bfdbfe;
 }
+.week-card h2 {
+  margin-top: 0;
+}
+
+.week-status {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.week-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.week-option-button {
+  width: 100%;
+  text-align: left;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #1f2937;
+  background: #020617;
+  color: #e5e7eb;
+  cursor: pointer;
+  transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.week-option-button h3 {
+  margin: 0 0 0.25rem;
+  font-size: 0.98rem;
+  color: #e5e7eb;
+}
+
+.week-option-button p {
+  margin: 0.15rem 0;
+  font-size: 0.84rem;
+  color: #9ca3af;
+}
+
+.week-option-button .effects-text {
+  font-size: 0.8rem;
+  color: #93c5fd;
+}
+
+.week-option-button:hover {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px #2563eb;
+  background: #020617;
+}
 
 .creation-subtitle {
   margin: 0 0 1.5rem;

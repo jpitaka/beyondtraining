@@ -123,8 +123,9 @@ function criarJogadorInicial(formData) {
 }
 
 function App() {
-  const [screen, setScreen] = useState("characterCreation");
+  const [screen, setScreen] = useState("characterCreation"); // 'characterCreation' | 'weekHub' | 'game'
   const [currentSceneId, setCurrentSceneId] = useState("inicio");
+  const [week, setWeek] = useState(1);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -141,6 +142,15 @@ function App() {
 
   const handleOptionClick = (option) => {
     if (!player) return;
+
+    // opção para sair do jogo e voltar à semana seguinte
+    if (option.goToWeekHub) {
+      setLastTestResult(null);
+      setWeek((prev) => prev + 1);
+      setCurrentSceneId("inicio");
+      setScreen("weekHub");
+      return;
+    }
 
     let testResult = null;
 
@@ -193,6 +203,44 @@ function App() {
 
     const novoJogador = criarJogadorInicial(formData);
     setPlayer(novoJogador);
+    setWeek(1);
+    setCurrentSceneId("inicio");
+    setLastTestResult(null);
+    setScreen("weekHub");
+  };
+
+  const handleTrainingChoice = (type) => {
+    if (!player) return;
+
+    setPlayer((prev) => {
+      if (!prev) return prev;
+
+      const updated = {
+        ...prev,
+        attributes: { ...prev.attributes },
+      };
+
+      if (type === "fisico") {
+        // treino físico intenso
+        updated.stamina = clamp(prev.stamina + 10, 0, 100);
+        updated.morale = clamp(prev.morale - 5, 0, 100);
+        updated.attributes.resistencia = (prev.attributes.resistencia || 0) + 1;
+      } else if (type === "tecnico") {
+        // treino técnico leve
+        updated.stamina = clamp(prev.stamina - 5, 0, 100);
+        updated.morale = clamp(prev.morale + 5, 0, 100);
+        updated.attributes.remate = (prev.attributes.remate || 0) + 1;
+        updated.attributes.passe = (prev.attributes.passe || 0) + 1;
+      } else if (type === "descanso") {
+        // foco em descanso e recuperação
+        updated.stamina = clamp(prev.stamina + 15, 0, 100);
+        updated.morale = clamp(prev.morale + 5, 0, 100);
+      }
+
+      return updated;
+    });
+
+    setLastTestResult(null);
     setCurrentSceneId("inicio");
     setScreen("game");
   };
@@ -204,6 +252,7 @@ function App() {
 
         {player && (
           <div className="status-bar">
+            <span>Semana: {week}</span>
             <span>Condição Física: {player.stamina}</span>
             <span>Moral: {player.morale}</span>
           </div>
@@ -311,6 +360,70 @@ function App() {
             </form>
           </section>
         </main>
+      ) : screen === "weekHub" ? (
+        <main className="content creation-content">
+          <section className="creation-card week-card">
+            <h2>Semana {week} – Treino</h2>
+            <p className="creation-subtitle">
+              Escolhe o foco da semana antes do próximo jogo.
+            </p>
+
+            {player && (
+              <div className="week-status">
+                <p>
+                  <strong>Condição Física:</strong> {player.stamina}
+                </p>
+                <p>
+                  <strong>Moral:</strong> {player.morale}
+                </p>
+              </div>
+            )}
+
+            <div className="week-options">
+              <button
+                className="week-option-button"
+                onClick={() => handleTrainingChoice("fisico")}
+              >
+                <h3>Treino físico intenso</h3>
+                <p>
+                  Corridas, trabalho de força e resistência. Ficas mais preparado
+                  para aguentar o jogo, mas chegas um pouco mais carregado.
+                </p>
+                <p className="effects-text">
+                  + Resistência, + CF, - um pouco de Moral
+                </p>
+              </button>
+
+              <button
+                className="week-option-button"
+                onClick={() => handleTrainingChoice("tecnico")}
+              >
+                <h3>Treino técnico</h3>
+                <p>
+                  Finalização, passes em espaços curtos, combinações. Menos carga
+                  física, mais foco na bola.
+                </p>
+                <p className="effects-text">
+                  + Remate, + Passe, - um pouco de CF, + Moral
+                </p>
+              </button>
+
+              <button
+                className="week-option-button"
+                onClick={() => handleTrainingChoice("descanso")}
+              >
+                <h3>Recuperação e descanso</h3>
+                <p>
+                  Sessões leves, massagem, gelo e foco em dormir bem. Chegas mais
+                  fresco, mas não evoluis tanto.
+                </p>
+                <p className="effects-text">
+                  ++ CF, + Moral, sem aumento directo de atributos
+                </p>
+              </button>
+            </div>
+          </section>
+        </main>
       ) : (
         <main className="content">
           <aside className="sidebar">
@@ -378,8 +491,7 @@ function App() {
                 </p>
                 <p>
                   d20: {lastTestResult.roll} + atributo (
-                  {lastTestResult.attributeValue}) ={" "}
-                  {lastTestResult.total}
+                  {lastTestResult.attributeValue}) = {lastTestResult.total}
                 </p>
                 <p>
                   {lastTestResult.isCritSuccess

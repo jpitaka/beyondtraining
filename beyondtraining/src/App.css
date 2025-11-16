@@ -48,6 +48,161 @@ body {
   padding: 0 1.5rem;
 }
 
+/* === Criação de personagem === */
+
+.creation-content {
+  justify-content: center;
+}
+
+.creation-card {
+  flex: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  background: rgba(15, 23, 42, 0.95);
+  border-radius: 16px;
+  padding: 1.75rem;
+  border: 1px solid #1f2937;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+}
+
+.creation-card h2 {
+  margin-top: 0;
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #bfdbfe;
+}
+
+.creation-subtitle {
+  margin: 0 0 1.5rem;
+  font-size: 0.95rem;
+  color: #9ca3af;
+}
+
+.creation-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.field-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem 1.5rem;
+}
+
+.field-group label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+}
+
+.field-group input,
+.field-group select {
+  border-radius: 999px;
+  border: 1px solid #374151;
+  background: #020617;
+  color: #e5e7eb;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.field-group input:focus,
+.field-group select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px #2563eb;
+}
+
+.backstories h3 {
+  margin: 0 0 0.3rem;
+  font-size: 1rem;
+  color: #bfdbfe;
+}
+
+.help-text {
+  margin: 0 0 0.8rem;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.backstory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 0.8rem;
+}
+
+.backstory-card {
+  border-radius: 14px;
+  border: 1px solid #1f2937;
+  background: #020617;
+  padding: 0.8rem 0.85rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  cursor: pointer;
+  transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.backstory-card input[type="radio"] {
+  margin-top: 0.3rem;
+}
+
+.backstory-card--active {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px #2563eb;
+  background: #020617;
+}
+
+.backstory-content h4 {
+  margin: 0 0 0.2rem;
+  font-size: 0.95rem;
+  color: #e5e7eb;
+}
+
+.backstory-content p {
+  margin: 0.1rem 0;
+  font-size: 0.82rem;
+  color: #9ca3af;
+}
+
+.backstory-content .effects-text {
+  font-size: 0.8rem;
+  color: #93c5fd;
+}
+
+.creation-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.primary-button {
+  padding: 0.8rem 1.4rem;
+  border-radius: 999px;
+  border: none;
+  background: #2563eb;
+  color: #e5e7eb;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  transition: background 0.15s ease, transform 0.05s ease,
+    box-shadow 0.15s ease;
+}
+
+.primary-button:hover {
+  background: #1d4ed8;
+  box-shadow: 0 0 0 1px #1d4ed8;
+}
+
+.primary-button:active {
+  transform: translateY(1px);
+}
+
+/* === Ficha + história === */
+
 .sidebar {
   width: 260px;
   background: rgba(15, 23, 42, 0.95);

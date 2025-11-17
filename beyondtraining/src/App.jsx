@@ -86,6 +86,17 @@ const BASE_STATS_POR_POSICAO = {
   }
 };
 
+function defaultPersonality() {
+  return {
+    profissionalismo: 50, // 0 = Boémio, 100 = Profissional
+    fairplay: 50,        // 0 = Anti-jogo, 100 = Fair-play
+    loyalty: 50,         // 0 = Mercenário, 100 = Leal ao clube
+    humildade: 50,       // 0 = Ego elevado, 100 = Humilde
+    equipa: 50,          // 0 = Individualista, 100 = Trabalho de equipa
+    calma: 50            // 0 = Explosivo, 100 = Calmo
+  };
+}
+
 function criarJogadorInicial(formData) {
   const baseStats =
     BASE_STATS_POR_POSICAO[formData.position] || BASE_STATS_POR_POSICAO.default;
@@ -127,6 +138,7 @@ function criarJogadorInicial(formData) {
       fans: 40,
       media: 40
     },
+    personality: defaultPersonality(),
     level: 1,
     xp: 0
   };
@@ -167,6 +179,11 @@ function App() {
 
       const data = JSON.parse(raw);
       if (!data.player) return;
+
+      // garantir que jogadores antigos recebem personalidade
+      if (!data.player.personality) {
+        data.player.personality = defaultPersonality();
+      }
 
       setPlayer(data.player);
       setScreen(data.screen || "weekHub");
@@ -210,15 +227,13 @@ function App() {
     if (!isRolling || !pendingAction) return;
 
     let ticks = 0;
-    const maxTicks = 15; // ~1.2s
-
+    const maxTicks = 12; // podes afinar
     const interval = setInterval(() => {
       ticks++;
       if (ticks >= maxTicks) {
         clearInterval(interval);
         const final = pendingAction.testResult.roll;
         setRollDisplay(final);
-        // pequena pausa para "cair" o número
         setTimeout(() => {
           finalizarRoll(pendingAction);
         }, 400);
@@ -226,68 +241,17 @@ function App() {
         const randomValue = Math.floor(Math.random() * 20) + 1;
         setRollDisplay(randomValue);
       }
-    }, 120);
+    }, 110); // já está um pouco mais lento
 
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRolling, pendingAction]);
 
   const handleOptionClick = (option) => {
     if (!player || isRolling) return;
 
-    // opções normais sem teste
+    // opções sem teste: aplicam logo
     if (!option.test) {
-      const effects = option.effects || {};
-      const relationEffects = option.relationEffects || {};
-      const xpGain = option.xp ?? 0;
-
-      setPlayer((prev) => {
-        if (!prev) return prev;
-        if (option.reset) return prev;
-
-        let updated = {
-          ...prev,
-          relations: { ...(prev.relations || {}) }
-        };
-
-        updated = applyXp(updated, xpGain);
-
-        const morale = clamp(updated.morale + (effects.morale ?? 0), 0, 100);
-        const stamina = clamp(updated.stamina + (effects.stamina ?? 0), 0, 100);
-        updated.morale = morale;
-        updated.stamina = stamina;
-
-        for (const key of Object.keys(relationEffects)) {
-          const current = updated.relations[key] ?? 50;
-          const change = relationEffects[key];
-          updated.relations[key] = clamp(current + change, 0, 100);
-        }
-
-        return updated;
-      });
-
-      setLastDelta({
-        moraleChange: effects.morale ?? 0,
-        staminaChange: effects.stamina ?? 0,
-        relationsChange: relationEffects,
-        xpChange: xpGain
-      });
-
-      setLastTestResult(null);
-
-      let nextId = option.next ?? currentSceneId;
-
-      if (option.goToWeekHub) {
-        setLastTestResult(null);
-        setFreeActionText("");
-        setFreeActionFeedback("");
-        setCurrentSceneId("inicio");
-        setScreen("weekHub");
-        setWeek((prev) => prev + 1);
-        return;
-      }
-
-      setCurrentSceneId(nextId);
+      aplicarConsequencias(option, null);
       return;
     }
 
@@ -309,8 +273,19 @@ function App() {
     };
     setLastTestResult(extendedResult);
 
+    aplicarConsequencias(option, testResult);
+
+    setIsRolling(false);
+    setRollDisplay(null);
+    setPendingAction(null);
+  };
+
+  function aplicarConsequencias(option, testResult) {
+    if (!player) return;
+
     const effects = option.effects || {};
     const relationEffects = option.relationEffects || {};
+    const personalityEffects = option.personalityEffects || {};
     const xpGain = option.xp ?? 0;
 
     setPlayer((prev) => {
@@ -319,20 +294,32 @@ function App() {
 
       let updated = {
         ...prev,
-        relations: { ...(prev.relations || {}) }
+        relations: { ...(prev.relations || {}) },
+        personality: { ...(prev.personality || defaultPersonality()) }
       };
 
+      // XP + nível
       updated = applyXp(updated, xpGain);
 
+      // CF / Moral
       const morale = clamp(updated.morale + (effects.morale ?? 0), 0, 100);
       const stamina = clamp(updated.stamina + (effects.stamina ?? 0), 0, 100);
       updated.morale = morale;
       updated.stamina = stamina;
 
+      // relações
       for (const key of Object.keys(relationEffects)) {
         const current = updated.relations[key] ?? 50;
         const change = relationEffects[key];
         updated.relations[key] = clamp(current + change, 0, 100);
+      }
+
+      // personalidade
+      for (const key of Object.keys(personalityEffects)) {
+        if (!(key in updated.personality)) continue;
+        const current = updated.personality[key] ?? 50;
+        const change = personalityEffects[key];
+        updated.personality[key] = clamp(current + change, 0, 100);
       }
 
       return updated;
@@ -342,18 +329,21 @@ function App() {
       moraleChange: effects.morale ?? 0,
       staminaChange: effects.stamina ?? 0,
       relationsChange: relationEffects,
+      personalityChange: personalityEffects,
       xpChange: xpGain
     });
 
     let nextId = option.next ?? currentSceneId;
-    if (testResult.success) {
-      nextId = option.nextOnSuccess ?? option.next ?? currentSceneId;
-    } else {
-      nextId = option.nextOnFailure ?? option.next ?? currentSceneId;
+
+    if (option.test && testResult) {
+      if (testResult.success) {
+        nextId = option.nextOnSuccess ?? option.next ?? currentSceneId;
+      } else {
+        nextId = option.nextOnFailure ?? option.next ?? currentSceneId;
+      }
     }
 
     if (option.goToWeekHub) {
-      setLastTestResult(extendedResult);
       setFreeActionText("");
       setFreeActionFeedback("");
       setCurrentSceneId("inicio");
@@ -362,11 +352,7 @@ function App() {
     } else {
       setCurrentSceneId(nextId);
     }
-
-    setIsRolling(false);
-    setRollDisplay(null);
-    setPendingAction(null);
-  };
+  }
 
   const handleFreeActionSubmit = () => {
     if (!player || isRolling) return;
@@ -438,7 +424,8 @@ function App() {
       let updated = {
         ...prev,
         attributes: { ...prev.attributes },
-        relations: { ...(prev.relations || {}) }
+        relations: { ...(prev.relations || {}) },
+        personality: { ...(prev.personality || defaultPersonality()) }
       };
 
       if (type === "fisico") {
@@ -448,6 +435,11 @@ function App() {
         updated.stamina = clamp(prev.stamina + staminaChange, 0, 100);
         updated.morale = clamp(prev.morale + moraleChange, 0, 100);
         updated.attributes.resistencia = (prev.attributes.resistencia || 0) + 1;
+        updated.personality.profissionalismo = clamp(
+          (updated.personality.profissionalismo ?? 50) + 1,
+          0,
+          100
+        );
       } else if (type === "tecnico") {
         staminaChange = -5;
         moraleChange = +5;
@@ -462,6 +454,11 @@ function App() {
         xpGain = 5;
         updated.stamina = clamp(prev.stamina + staminaChange, 0, 100);
         updated.morale = clamp(prev.morale + moraleChange, 0, 100);
+        updated.personality.calma = clamp(
+          (updated.personality.calma ?? 50) + 1,
+          0,
+          100
+        );
       }
 
       updated = applyXp(updated, xpGain);
@@ -474,6 +471,7 @@ function App() {
       moraleChange,
       staminaChange,
       relationsChange: {},
+      personalityChange: {},
       xpChange: xpGain
     });
 
@@ -847,6 +845,47 @@ function App() {
                     <Delta change={lastDelta?.relationsChange?.media ?? 0} />
                   </div>
                 </div>
+
+                <hr className="sidebar-divider" />
+
+                <h3>Personalidade</h3>
+
+                <AxisRow
+                  label="Profissionalismo / Boémio"
+                  left="Boémio"
+                  right="Profissional"
+                  value={player.personality?.profissionalismo ?? 50}
+                />
+                <AxisRow
+                  label="Fair-play / Anti-jogo"
+                  left="Anti-jogo"
+                  right="Fair-play"
+                  value={player.personality?.fairplay ?? 50}
+                />
+                <AxisRow
+                  label="Lealdade ao clube / Mercenário"
+                  left="Mercenário"
+                  right="Leal ao clube"
+                  value={player.personality?.loyalty ?? 50}
+                />
+                <AxisRow
+                  label="Humildade / Ego"
+                  left="Ego"
+                  right="Humilde"
+                  value={player.personality?.humildade ?? 50}
+                />
+                <AxisRow
+                  label="Trabalho de equipa / Individualista"
+                  left="Individualista"
+                  right="Equipa"
+                  value={player.personality?.equipa ?? 50}
+                />
+                <AxisRow
+                  label="Calma / Temperamento explosivo"
+                  left="Explosivo"
+                  right="Calmo"
+                  value={player.personality?.calma ?? 50}
+                />
               </>
             )}
           </aside>
@@ -1046,6 +1085,22 @@ function Delta({ change }) {
     change > 0 ? "delta delta--pos" : "delta delta--neg";
 
   return <span className={className}>{sign}{change}</span>;
+}
+
+function AxisRow({ label, left, right, value }) {
+  const pct = clamp(value ?? 50, 0, 100);
+  return (
+    <div className="axis-row">
+      <div className="axis-header">
+        <span className="axis-title">{label}</span>
+      </div>
+      <div className="axis-bar-wrapper">
+        <span className="axis-end">{left}</span>
+        <Bar value={pct} />
+        <span className="axis-end">{right}</span>
+      </div>
+    </div>
+  );
 }
 
 export default App;

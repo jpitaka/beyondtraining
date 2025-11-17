@@ -15,6 +15,12 @@ export const scenes = {
           coach: +5,
           team: +2
         },
+        personalityEffects: {
+          profissionalismo: +5,
+          humildade: -5,
+          equipa: +2,
+          calma: -2
+        },
         xp: 10
       },
       {
@@ -24,6 +30,11 @@ export const scenes = {
         effects: { morale: -5 },
         relationEffects: {
           coach: -2
+        },
+        personalityEffects: {
+          humildade: +6,
+          calma: +3,
+          profissionalismo: +1
         },
         xp: 5
       }
@@ -38,6 +49,9 @@ export const scenes = {
         id: "ir_para_campo",
         label: "Seguir para o túnel de acesso ao relvado.",
         next: "entrada_campo",
+        personalityEffects: {
+          equipa: +2
+        },
         xp: 5
       }
     ]
@@ -51,6 +65,10 @@ export const scenes = {
         id: "ir_para_campo2",
         label: "Seguir para o túnel de acesso ao relvado.",
         next: "entrada_campo",
+        personalityEffects: {
+          equipa: -1,
+          humildade: +2
+        },
         xp: 5
       }
     ]
@@ -65,6 +83,10 @@ export const scenes = {
         label: "Respirar fundo e focar só no jogo.",
         next: "primeira_chance",
         effects: { stamina: -5 },
+        personalityEffects: {
+          calma: +4,
+          profissionalismo: +3
+        },
         xp: 5
       },
       {
@@ -74,6 +96,10 @@ export const scenes = {
         effects: { morale: +5 },
         relationEffects: {
           fans: +3
+        },
+        personalityEffects: {
+          equipa: +1,
+          calma: -2
         },
         xp: 5
       }
@@ -95,6 +121,10 @@ export const scenes = {
         },
         nextOnSuccess: "remate_sucesso",
         nextOnFailure: "remate_falha",
+        personalityEffects: {
+          profissionalismo: +2,
+          equipa: -1
+        },
         xp: 20
       },
       {
@@ -107,6 +137,11 @@ export const scenes = {
         },
         nextOnSuccess: "drible_sucesso",
         nextOnFailure: "drible_falha",
+        personalityEffects: {
+          ego: 0, // ignorado, só exemplo se quiseres mais tarde
+          equipa: -1,
+          calma: -2
+        },
         xp: 20
       },
       {
@@ -117,6 +152,10 @@ export const scenes = {
         relationEffects: {
           team: +4,
           fans: -2
+        },
+        personalityEffects: {
+          equipa: +4,
+          humildade: +2
         },
         xp: 15
       }
@@ -139,6 +178,10 @@ export const scenes = {
           fans: +8,
           media: +5
         },
+        personalityEffects: {
+          calma: +2,
+          equipa: +2
+        },
         xp: 30
       }
     ]
@@ -157,6 +200,10 @@ export const scenes = {
         relationEffects: {
           fans: +1,
           coach: -1
+        },
+        personalityEffects: {
+          calma: +1,
+          profissionalismo: +2
         },
         xp: 20
       }
@@ -177,6 +224,10 @@ export const scenes = {
           fans: +6,
           coach: +2
         },
+        personalityEffects: {
+          humildade: -3,
+          equipa: +1
+        },
         xp: 25
       }
     ]
@@ -195,6 +246,10 @@ export const scenes = {
         relationEffects: {
           coach: +1,
           fans: -2
+        },
+        personalityEffects: {
+          equipa: +2,
+          calma: +1
         },
         xp: 15
       }

@@ -1,3 +1,6 @@
+// src/scenes.js
+import { INTENTS } from "./intentsDictionary";
+
 export const scenes = {
   inicio: {
     title: "Balneário – Jornada 1",
@@ -10,9 +13,9 @@ export const scenes = {
         effects: { morale: +10 },
         relationEffects: {
           coach: +5,
-          team: +2,
+          team: +2
         },
-        xp: 10,
+        xp: 10
       },
       {
         id: "ficar_calado",
@@ -20,11 +23,11 @@ export const scenes = {
         next: "calado",
         effects: { morale: -5 },
         relationEffects: {
-          coach: -2,
+          coach: -2
         },
-        xp: 5,
-      },
-    ],
+        xp: 5
+      }
+    ]
   },
 
   confiante: {
@@ -35,9 +38,9 @@ export const scenes = {
         id: "ir_para_campo",
         label: "Seguir para o túnel de acesso ao relvado.",
         next: "entrada_campo",
-        xp: 5,
-      },
-    ],
+        xp: 5
+      }
+    ]
   },
 
   calado: {
@@ -48,9 +51,9 @@ export const scenes = {
         id: "ir_para_campo2",
         label: "Seguir para o túnel de acesso ao relvado.",
         next: "entrada_campo",
-        xp: 5,
-      },
-    ],
+        xp: 5
+      }
+    ]
   },
 
   entrada_campo: {
@@ -62,7 +65,7 @@ export const scenes = {
         label: "Respirar fundo e focar só no jogo.",
         next: "primeira_chance",
         effects: { stamina: -5 },
-        xp: 5,
+        xp: 5
       },
       {
         id: "olhar_bancada",
@@ -70,17 +73,17 @@ export const scenes = {
         next: "primeira_chance",
         effects: { morale: +5 },
         relationEffects: {
-          fans: +3,
+          fans: +3
         },
-        xp: 5,
-      },
-    ],
+        xp: 5
+      }
+    ]
   },
 
   primeira_chance: {
     title: "Primeira Oportunidade",
     text: "Ainda na primeira parte, a bola sobra para ti à entrada da área. Tens espaço durante um segundo, antes de o defesa fechar.",
-    // BOTÕES (continuam a existir, para já)
+    // Sugestões rápidas (apenas 3 botões)
     options: [
       {
         id: "rematar_baliza",
@@ -88,89 +91,38 @@ export const scenes = {
         test: {
           attribute: "remate",
           dc: 14,
-          description: "Remate à entrada da área",
+          description: "Remate à entrada da área"
         },
         nextOnSuccess: "remate_sucesso",
         nextOnFailure: "remate_falha",
-        xp: 20,
+        xp: 20
       },
       {
-        id: "passe_seguro",
+        id: "driblar_defesa_botao",
+        label: "Tentar driblar o defesa e ir para dentro.",
+        test: {
+          attribute: "drible",
+          dc: 13,
+          description: "Drible ao defesa"
+        },
+        nextOnSuccess: "drible_sucesso",
+        nextOnFailure: "drible_falha",
+        xp: 20
+      },
+      {
+        id: "passe_seguro_botao",
         label: "Jogar pelo seguro e soltar no colega melhor posicionado.",
         next: "fim_demo",
         effects: { morale: -2 },
         relationEffects: {
           team: +4,
-          fans: -2,
+          fans: -2
         },
-        xp: 15,
-      },
+        xp: 15
+      }
     ],
-    // INTENTS PARA TEXTO LIVRE
-    intents: [
-      {
-        id: "rematar_intent",
-        label: "Rematar à baliza",
-        keywords: [
-          "remato",
-          "rematar",
-          "remate",
-          "chuto",
-          "chutar",
-          "disparo",
-          "atirar à baliza",
-          "remato à baliza",
-        ],
-        test: {
-          attribute: "remate",
-          dc: 14,
-          description: "Remate à entrada da área",
-        },
-        nextOnSuccess: "remate_sucesso",
-        nextOnFailure: "remate_falha",
-        xp: 20,
-      },
-      {
-        id: "drible_intent",
-        label: "Driblar o defesa",
-        keywords: [
-          "driblo",
-          "driblar",
-          "finto",
-          "fintar",
-          "tento passar",
-          "passo pelo defesa",
-          "vou para cima dele",
-        ],
-        test: {
-          attribute: "drible",
-          dc: 13,
-          description: "Drible ao defesa",
-        },
-        nextOnSuccess: "drible_sucesso",
-        nextOnFailure: "drible_falha",
-        xp: 20,
-      },
-      {
-        id: "passe_intent",
-        label: "Passe para o colega",
-        keywords: [
-          "passe",
-          "passo",
-          "passar a bola",
-          "toco no colega",
-          "solto a bola",
-          "jogar pelo seguro",
-        ],
-        next: "fim_demo",
-        effects: { morale: -2 },
-        relationEffects: {
-          team: +4,
-          fans: -2,
-        },
-        xp: 15,
-      },
-    ],
+    // 10 intents completas, vindas do dicionário
+    intents: INTENTS.chance_finalizacao
   },
 
   remate_sucesso: {
@@ -185,11 +137,11 @@ export const scenes = {
         relationEffects: {
           coach: +4,
           fans: +8,
-          media: +5,
+          media: +5
         },
-        xp: 30,
-      },
-    ],
+        xp: 30
+      }
+    ]
   },
 
   remate_falha: {
@@ -204,11 +156,11 @@ export const scenes = {
         effects: { morale: +2, stamina: -5 },
         relationEffects: {
           fans: +1,
-          coach: -1,
+          coach: -1
         },
-        xp: 20,
-      },
-    ],
+        xp: 20
+      }
+    ]
   },
 
   drible_sucesso: {
@@ -223,11 +175,11 @@ export const scenes = {
         relationEffects: {
           team: +5,
           fans: +6,
-          coach: +2,
+          coach: +2
         },
-        xp: 25,
-      },
-    ],
+        xp: 25
+      }
+    ]
   },
 
   drible_falha: {
@@ -242,11 +194,11 @@ export const scenes = {
         effects: { stamina: -5 },
         relationEffects: {
           coach: +1,
-          fans: -2,
+          fans: -2
         },
-        xp: 15,
-      },
-    ],
+        xp: 15
+      }
+    ]
   },
 
   fim_demo: {
@@ -257,8 +209,8 @@ export const scenes = {
         id: "ir_para_semana",
         label: "Ir para a semana seguinte.",
         goToWeekHub: true,
-        xp: 10,
-      },
-    ],
-  },
+        xp: 10
+      }
+    ]
+  }
 };

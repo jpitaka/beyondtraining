@@ -10,7 +10,7 @@ const BACKSTORIES = [
     title: "Diamante do Bairro",
     description:
       "Cresceste a jogar nas ruas e ringues do bairro. Toda a gente te conhece desde miúdo.",
-    effectsText: "+ Moral inicial, menos pressão mediática.",
+    effectsText: "+ Moral inicial, menos pressão mediática."
   },
   {
     id: "academia",
@@ -18,29 +18,29 @@ const BACKSTORIES = [
     description:
       "Entraste cedo na formação do clube. És “produto da casa” e toda a estrutura sabe quem és.",
     effectsText:
-      "+ Relação inicial com o treinador / direcção, expectativas internas mais altas.",
+      "+ Relação inicial com o treinador / direcção, expectativas internas mais altas."
   },
   {
     id: "importacao",
     title: "Importação Estrangeira",
     description:
       "Vieste de outro país para tentar a sorte. Chegas como aposta de alguém lá em cima.",
-    effectsText: "+ Técnica inicial, adaptação cultural mais difícil.",
+    effectsText: "+ Técnica inicial, adaptação cultural mais difícil."
   },
   {
     id: "veterano",
     title: "Veterano Tardio",
     description:
       "Andaste anos em equipas pequenas ou noutra profissão. Agora tens a tua última oportunidade.",
-    effectsText: "+ Atributos mentais, - Atributos físicos iniciais.",
-  },
+    effectsText: "+ Atributos mentais, - Atributos físicos iniciais."
+  }
 ];
 
 const POSICOES = [
   "Médio Ofensivo (Maestro)",
   "Avançado Centro (Matador)",
   "Defesa Central (Muralha)",
-  "Guarda-redes (Guardião)",
+  "Guarda-redes (Guardião)"
 ];
 
 const BASE_STATS_POR_POSICAO = {
@@ -50,7 +50,7 @@ const BASE_STATS_POR_POSICAO = {
     drible: 7,
     velocidade: 5,
     resistencia: 5,
-    compostura: 6,
+    compostura: 6
   },
   "Avançado Centro (Matador)": {
     remate: 8,
@@ -58,7 +58,7 @@ const BASE_STATS_POR_POSICAO = {
     drible: 5,
     velocidade: 6,
     resistencia: 5,
-    compostura: 5,
+    compostura: 5
   },
   "Defesa Central (Muralha)": {
     remate: 3,
@@ -66,7 +66,7 @@ const BASE_STATS_POR_POSICAO = {
     drible: 3,
     velocidade: 4,
     resistencia: 7,
-    compostura: 7,
+    compostura: 7
   },
   "Guarda-redes (Guardião)": {
     remate: 2,
@@ -74,7 +74,7 @@ const BASE_STATS_POR_POSICAO = {
     drible: 2,
     velocidade: 4,
     resistencia: 7,
-    compostura: 8,
+    compostura: 8
   },
   default: {
     remate: 4,
@@ -82,8 +82,8 @@ const BASE_STATS_POR_POSICAO = {
     drible: 4,
     velocidade: 4,
     resistencia: 4,
-    compostura: 4,
-  },
+    compostura: 4
+  }
 };
 
 function criarJogadorInicial(formData) {
@@ -125,10 +125,10 @@ function criarJogadorInicial(formData) {
       coach: 60,
       team: 50,
       fans: 40,
-      media: 40,
+      media: 40
     },
     level: 1,
-    xp: 0,
+    xp: 0
   };
 }
 
@@ -142,7 +142,7 @@ function App() {
     nickname: "",
     position: POSICOES[0],
     club: "Clube Continental",
-    backstory: "diamante",
+    backstory: "diamante"
   });
 
   const [player, setPlayer] = useState(null);
@@ -187,7 +187,7 @@ function App() {
       player,
       screen,
       currentSceneId,
-      week,
+      week
     };
 
     try {
@@ -207,7 +207,7 @@ function App() {
       setLastTestResult({
         ...testResult,
         description: option.test.description || "Lance importante",
-        attribute: option.test.attribute,
+        attribute: option.test.attribute
       });
     } else {
       setLastTestResult(null);
@@ -223,7 +223,7 @@ function App() {
 
       let updated = {
         ...prev,
-        relations: { ...(prev.relations || {}) },
+        relations: { ...(prev.relations || {}) }
       };
 
       // XP + nível
@@ -249,7 +249,7 @@ function App() {
       moraleChange: effects.morale ?? 0,
       staminaChange: effects.stamina ?? 0,
       relationsChange: relationEffects,
-      xpChange: xpGain,
+      xpChange: xpGain
     });
 
     let nextId = option.next ?? currentSceneId;
@@ -265,7 +265,6 @@ function App() {
     if (option.goToWeekHub) {
       setLastTestResult(null);
       setFreeActionText("");
-      // podes manter o feedback da última ação se quiseres
       setCurrentSceneId("inicio");
       setScreen("weekHub");
       setWeek((prev) => prev + 1);
@@ -287,7 +286,7 @@ function App() {
     const currentScene = scenes[currentSceneId];
     if (!currentScene || !Array.isArray(currentScene.intents)) {
       setFreeActionFeedback(
-        "Neste momento tens de escolher uma das opções disponíveis."
+        "Neste momento tens de escolher uma das sugestões rápidas."
       );
       return;
     }
@@ -311,7 +310,7 @@ function App() {
     const { name, value } = event.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: value
     }));
   };
 
@@ -342,7 +341,7 @@ function App() {
       let updated = {
         ...prev,
         attributes: { ...prev.attributes },
-        relations: { ...(prev.relations || {}) },
+        relations: { ...(prev.relations || {}) }
       };
 
       if (type === "fisico") {
@@ -378,7 +377,7 @@ function App() {
       moraleChange,
       staminaChange,
       relationsChange: {},
-      xpChange: xpGain,
+      xpChange: xpGain
     });
 
     setFreeActionText("");
@@ -406,7 +405,7 @@ function App() {
       nickname: "",
       position: POSICOES[0],
       club: "Clube Continental",
-      backstory: "diamante",
+      backstory: "diamante"
     });
   };
 
@@ -780,46 +779,54 @@ function App() {
               </div>
             )}
 
-            {/* Caixa de texto para decisões livres */}
-            <div className="free-action">
-              <label htmlFor="free-action-input">
-                Escreve o que queres fazer nesta jogada:
-              </label>
-              <textarea
-                id="free-action-input"
-                rows={2}
-                value={freeActionText}
-                onChange={(e) => setFreeActionText(e.target.value)}
-                placeholder='Ex.: "Remato em força ao canto", "Tento driblar o defesa", "Faço o passe seguro".'
-              />
-              <button
-                type="button"
-                className="free-action-button"
-                onClick={handleFreeActionSubmit}
-              >
-                Confirmar decisão
-              </button>
-              {freeActionFeedback && (
-                <p className="free-action-feedback">{freeActionFeedback}</p>
-              )}
-              {scene.intents && (
+            {/* Caixa de texto para decisões livres – só nas cenas com intents */}
+            {scene.intents && (
+              <div className="free-action">
+                <label htmlFor="free-action-input">
+                  Escreve o que queres fazer nesta jogada:
+                </label>
+                <textarea
+                  id="free-action-input"
+                  rows={2}
+                  value={freeActionText}
+                  onChange={(e) => setFreeActionText(e.target.value)}
+                  placeholder='Ex.: "Remato em força ao canto", "Tento driblar o defesa", "Faço o passe seguro".'
+                />
+                <button
+                  type="button"
+                  className="free-action-button"
+                  onClick={handleFreeActionSubmit}
+                >
+                  Confirmar decisão
+                </button>
+                {freeActionFeedback && (
+                  <p className="free-action-feedback">
+                    {freeActionFeedback}
+                  </p>
+                )}
                 <p className="free-action-hint">
                   Dica: usa verbos simples como rematar, driblar, passar.
                 </p>
-              )}
-            </div>
+              </div>
+            )}
 
-            <div className="options">
-              {scene.options.map((option) => (
-                <button
-                  key={option.id}
-                  className="option-button"
-                  onClick={() => handleOptionClick(option)}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
+            {/* Sugestões rápidas (antigos botões) */}
+            {scene.options && scene.options.length > 0 && (
+              <>
+                <h3 className="options-title">Sugestões rápidas</h3>
+                <div className="options">
+                  {scene.options.map((option) => (
+                    <button
+                      key={option.id}
+                      className="option-button"
+                      onClick={() => handleOptionClick(option)}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </section>
         </main>
       )}
@@ -872,19 +879,32 @@ function applyXp(player, xpGain) {
   return { ...player, level, xp };
 }
 
+// Escolhe a intent com MAIS palavras-chave que aparecem no texto
 function findIntentForText(scene, text) {
   if (!scene || !Array.isArray(scene.intents)) return null;
   const normalized = text.toLowerCase();
 
+  let bestIntent = null;
+  let bestScore = 0;
+
   for (const intent of scene.intents) {
-    if (!intent.keywords) continue;
+    if (!intent.keywords || intent.keywords.length === 0) continue;
+
+    let score = 0;
     for (const kw of intent.keywords) {
       if (normalized.includes(kw.toLowerCase())) {
-        return intent;
+        score += 1;
       }
     }
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestIntent = intent;
+    }
   }
-  return null;
+
+  if (bestScore === 0) return null;
+  return bestIntent;
 }
 
 function Bar({ value }) {

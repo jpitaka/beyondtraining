@@ -527,3 +527,12 @@ body {
   font-size: 0.75rem;
   color: #9ca3af;
 }
+
+.options-title {
+  margin-top: 0.75rem;
+  margin-bottom: 0.25rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+}

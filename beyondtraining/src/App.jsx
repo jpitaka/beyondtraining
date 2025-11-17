@@ -174,6 +174,9 @@ function App() {
   });
   const [lastMatchSummary, setLastMatchSummary] = useState(null);
 
+  const [currentEvent, setCurrentEvent] = useState(null);
+  const [eventWeek, setEventWeek] = useState(null);
+
   // estado do "dado"
   const [isRolling, setIsRolling] = useState(false);
   const [rollDisplay, setRollDisplay] = useState(null);
@@ -208,6 +211,8 @@ function App() {
         }
       );
       setLastMatchSummary(data.lastMatchSummary || null);
+      setCurrentEvent(data.currentEvent || null);
+      setEventWeek(data.eventWeek ?? null);
       setLastTestResult(null);
       setLastDelta(null);
       setFreeActionText("");
@@ -233,7 +238,9 @@ function App() {
       currentSceneId,
       week,
       matchStats,
-      lastMatchSummary
+      lastMatchSummary,
+      currentEvent,
+      eventWeek
     };
 
     try {
@@ -241,7 +248,7 @@ function App() {
     } catch (err) {
       console.warn("Falha a guardar save:", err);
     }
-  }, [player, screen, currentSceneId, week, matchStats, lastMatchSummary]);
+  }, [player, screen, currentSceneId, week, matchStats, lastMatchSummary, currentEvent, eventWeek]);
 
   // animação do "dado" (números a rodar)
   useEffect(() => {
@@ -266,6 +273,16 @@ function App() {
 
     return () => clearInterval(interval);
   }, [isRolling, pendingAction]);
+
+    useEffect(() => {
+    if (!player) return;
+    if (screen !== "weekHub") return;
+    if (eventWeek === week) return; // esta semana já foi processada
+
+    const event = generateWeeklyEvent(week, player);
+    setCurrentEvent(event);
+    setEventWeek(week);
+  }, [screen, week, player, eventWeek]);
 
   const handleOptionClick = (option) => {
     if (!player || isRolling) return;
@@ -455,6 +472,8 @@ function App() {
       keyPasses: 0
     });
     setLastMatchSummary(null);
+    setCurrentEvent(null);
+    setEventWeek(null);
     setLastTestResult(null);
     setLastDelta(null);
     setFreeActionText("");
@@ -537,9 +556,18 @@ function App() {
       bigChancesMissed: 0,
       keyPasses: 0
     });
+    setCurrentEvent(null);
 
     setCurrentSceneId("inicio");
     setScreen("game");
+  };
+
+  const handleSocialOptionClick = (option) => {
+    if (!player || isRolling || !currentEvent) return;
+
+    // Reutilizamos a mesma função que aplica efeitos das cenas de jogo
+    aplicarConsequencias(option, null);
+    setCurrentEvent(null);
   };
 
   const handleResetCareer = () => {
@@ -548,13 +576,6 @@ function App() {
     }
 
     localStorage.removeItem(STORAGE_KEY);
-    setMatchStats({
-      ratingDelta: 0,
-      goals: 0,
-      bigChancesMissed: 0,
-      keyPasses: 0
-    });
-    setLastMatchSummary(null);
     setPlayer(null);
     setScreen("characterCreation");
     setCurrentSceneId("inicio");
@@ -573,6 +594,15 @@ function App() {
       club: "Clube Continental",
       backstory: "diamante"
     });
+    setMatchStats({
+      ratingDelta: 0,
+      goals: 0,
+      bigChancesMissed: 0,
+      keyPasses: 0
+    });
+    setLastMatchSummary(null);
+    setCurrentEvent(null);
+    setEventWeek(null);
   };
 
   const xpNeeded = player ? xpForNext(player.level ?? 1) : 0;
@@ -772,6 +802,31 @@ function App() {
               <p className="last-match-comment">
                 {lastMatchSummary.comment}
               </p>
+            </section>
+          )}
+
+          {currentEvent && (
+            <section className="creation-card social-card">
+              <h2>Evento da semana</h2>
+              <p className="creation-subtitle">
+                Uma situação fora de campo que pode mudar a tua carreira.
+              </p>
+
+              <h3 className="social-title">{currentEvent.title}</h3>
+              <p className="social-text">{currentEvent.text}</p>
+
+              <div className="options">
+                {currentEvent.options.map((opt) => (
+                  <button
+                    key={opt.id}
+                    className="option-button"
+                    onClick={() => handleSocialOptionClick(opt)}
+                    disabled={isRolling}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
             </section>
           )}
 
@@ -1163,6 +1218,60 @@ function criarResumoJogo(stats) {
     keyPasses: stats.keyPasses || 0,
     comment
   };
+}
+function generateWeeklyEvent(week, player) {
+  if (!player) return null;
+
+  // Primeiro exemplo: evento aparece na Semana 2
+  if (week === 2) {
+    return {
+      id: "convite_festa",
+      title: "Convite para uma festa",
+      text:
+        "Depois do último jogo, alguns colegas mandam mensagem no grupo: estão a combinar uma festa grande para esta noite. Dizem que vai estar metade da cidade e que \"tens de aparecer\".",
+      options: [
+        {
+          id: "ir_festa",
+          label: "Aceitar o convite e ir à festa até tarde.",
+          effects: { stamina: -10, morale: +8 },
+          relationEffects: { team: +5, coach: -3 },
+          personalityEffects: {
+            profissionalismo: -5,
+            humildade: -2,
+            equipa: +2,
+            calma: -2
+          },
+          xp: 5
+        },
+        {
+          id: "ir_um_bocado",
+          label: "Aparecer um bocado, socializar e sair cedo.",
+          effects: { stamina: -3, morale: +3 },
+          relationEffects: { team: +2 },
+          personalityEffects: {
+            profissionalismo: +2,
+            equipa: +1,
+            calma: +1
+          },
+          xp: 10
+        },
+        {
+          id: "recusar",
+          label: "Recusar e dizer que precisas de descansar para o próximo jogo.",
+          effects: { stamina: +5, morale: -2 },
+          relationEffects: { team: -4, coach: +2 },
+          personalityEffects: {
+            profissionalismo: +4,
+            calma: +2
+          },
+          xp: 8
+        }
+      ]
+    };
+  }
+
+  // Sem evento nas outras semanas (por agora)
+  return null;
 }
 
 // escolhe a intent com mais keywords que batem

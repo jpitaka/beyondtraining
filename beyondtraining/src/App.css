@@ -789,3 +789,20 @@ body {
   color: #e5e7eb;
   margin-top: 0.25rem;
 }
+.social-card {
+  margin-bottom: 0.75rem;
+}
+
+.social-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e5e7eb;
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.social-text {
+  font-size: 0.8rem;
+  color: #d1d5db;
+  margin-bottom: 0.75rem;
+}

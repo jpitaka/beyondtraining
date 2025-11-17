@@ -12,6 +12,7 @@ export const scenes = {
           coach: +5,
           team: +2,
         },
+        xp: 10,
       },
       {
         id: "ficar_calado",
@@ -21,6 +22,7 @@ export const scenes = {
         relationEffects: {
           coach: -2,
         },
+        xp: 5,
       },
     ],
   },
@@ -33,6 +35,7 @@ export const scenes = {
         id: "ir_para_campo",
         label: "Seguir para o túnel de acesso ao relvado.",
         next: "entrada_campo",
+        xp: 5,
       },
     ],
   },
@@ -45,6 +48,7 @@ export const scenes = {
         id: "ir_para_campo2",
         label: "Seguir para o túnel de acesso ao relvado.",
         next: "entrada_campo",
+        xp: 5,
       },
     ],
   },
@@ -58,6 +62,7 @@ export const scenes = {
         label: "Respirar fundo e focar só no jogo.",
         next: "primeira_chance",
         effects: { stamina: -5 },
+        xp: 5,
       },
       {
         id: "olhar_bancada",
@@ -67,6 +72,7 @@ export const scenes = {
         relationEffects: {
           fans: +3,
         },
+        xp: 5,
       },
     ],
   },
@@ -85,6 +91,7 @@ export const scenes = {
         },
         nextOnSuccess: "remate_sucesso",
         nextOnFailure: "remate_falha",
+        xp: 20,
       },
       {
         id: "passe_seguro",
@@ -95,6 +102,7 @@ export const scenes = {
           team: +4,
           fans: -2,
         },
+        xp: 15,
       },
     ],
   },
@@ -113,6 +121,7 @@ export const scenes = {
           fans: +8,
           media: +5,
         },
+        xp: 30,
       },
     ],
   },
@@ -128,9 +137,10 @@ export const scenes = {
         next: "fim_demo",
         effects: { morale: +2, stamina: -5 },
         relationEffects: {
-          fans: +1, // respeitam o esforço
+          fans: +1,
           coach: -1,
         },
+        xp: 20,
       },
     ],
   },
@@ -143,6 +153,7 @@ export const scenes = {
         id: "ir_para_semana",
         label: "Ir para a semana seguinte.",
         goToWeekHub: true,
+        xp: 10,
       },
     ],
   },

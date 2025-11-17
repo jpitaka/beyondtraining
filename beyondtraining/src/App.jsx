@@ -127,6 +127,8 @@ function criarJogadorInicial(formData) {
       fans: 40,
       media: 40,
     },
+    level: 1,
+    xp: 0, // XP atual neste nível
   };
 }
 
@@ -219,24 +221,35 @@ function App() {
 
     const effects = option.effects || {};
     const relationEffects = option.relationEffects || {};
+    const xpGain = option.xp ?? 0;
 
     setPlayer((prev) => {
       if (!prev) return prev;
-
       if (option.reset) return prev;
 
-      const morale = clamp(prev.morale + (effects.morale ?? 0), 0, 100);
-      const stamina = clamp(prev.stamina + (effects.stamina ?? 0), 0, 100);
+      // começar por copiar
+      let updated = {
+        ...prev,
+        relations: { ...(prev.relations || {}) },
+      };
 
-      const relations = { ...(prev.relations || {}) };
+      // aplicar XP e possíveis subidas de nível
+      updated = applyXp(updated, xpGain);
 
+      // CF / Moral
+      const morale = clamp(updated.morale + (effects.morale ?? 0), 0, 100);
+      const stamina = clamp(updated.stamina + (effects.stamina ?? 0), 0, 100);
+      updated.morale = morale;
+      updated.stamina = stamina;
+
+      // relações
       for (const key of Object.keys(relationEffects)) {
-        const current = relations[key] ?? 50;
+        const current = updated.relations[key] ?? 50;
         const change = relationEffects[key];
-        relations[key] = clamp(current + change, 0, 100);
+        updated.relations[key] = clamp(current + change, 0, 100);
       }
 
-      return { ...prev, morale, stamina, relations };
+      return updated;
     });
 
     // guardar último delta para mostrar ao lado das barras
@@ -244,6 +257,7 @@ function App() {
       moraleChange: effects.morale ?? 0,
       staminaChange: effects.stamina ?? 0,
       relationsChange: relationEffects,
+      xpChange: xpGain,
     });
 
     let nextId = option.next ?? currentSceneId;
@@ -284,24 +298,28 @@ function App() {
 
     let staminaChange = 0;
     let moraleChange = 0;
+    let xpGain = 0;
 
     setPlayer((prev) => {
       if (!prev) return prev;
 
-      const updated = {
+      let updated = {
         ...prev,
         attributes: { ...prev.attributes },
+        relations: { ...(prev.relations || {}) },
       };
 
       if (type === "fisico") {
         staminaChange = +10;
         moraleChange = -5;
+        xpGain = 10;
         updated.stamina = clamp(prev.stamina + staminaChange, 0, 100);
         updated.morale = clamp(prev.morale + moraleChange, 0, 100);
         updated.attributes.resistencia = (prev.attributes.resistencia || 0) + 1;
       } else if (type === "tecnico") {
         staminaChange = -5;
         moraleChange = +5;
+        xpGain = 15;
         updated.stamina = clamp(prev.stamina + staminaChange, 0, 100);
         updated.morale = clamp(prev.morale + moraleChange, 0, 100);
         updated.attributes.remate = (prev.attributes.remate || 0) + 1;
@@ -309,9 +327,12 @@ function App() {
       } else if (type === "descanso") {
         staminaChange = +15;
         moraleChange = +5;
+        xpGain = 5;
         updated.stamina = clamp(prev.stamina + staminaChange, 0, 100);
         updated.morale = clamp(prev.morale + moraleChange, 0, 100);
       }
+
+      updated = applyXp(updated, xpGain);
 
       return updated;
     });
@@ -321,7 +342,9 @@ function App() {
       moraleChange,
       staminaChange,
       relationsChange: {},
+      xpChange: xpGain,
     });
+
     setCurrentSceneId("inicio");
     setScreen("game");
   };
@@ -347,6 +370,12 @@ function App() {
     });
   };
 
+  const xpNeeded = player ? xpForNext(player.level ?? 1) : 0;
+  const xpPct =
+    player && xpNeeded
+      ? clamp(((player.xp ?? 0) * 100) / xpNeeded, 0, 100)
+      : 0;
+
   return (
     <div className="app">
       <header className="header">
@@ -359,6 +388,18 @@ function App() {
                 <span className="status-label">Semana</span>
                 <div className="status-row">
                   <span className="status-value">{week}</span>
+                </div>
+              </div>
+
+              <div className="status-item">
+                <span className="status-label">Nível</span>
+                <div className="status-row">
+                  <span className="status-value">{player.level ?? 1}</span>
+                  <Bar value={xpPct} />
+                  <Delta change={lastDelta?.xpChange ?? 0} />
+                </div>
+                <div className="status-xp-detail">
+                  XP: {player.xp ?? 0} / {xpNeeded}
                 </div>
               </div>
 
@@ -613,9 +654,7 @@ function App() {
                     <span className="relation-value">
                       {player.relations?.coach ?? 50}{" "}
                       <span className="relation-label">
-                        (
-                        {describeRelation(player.relations?.coach ?? 50)}
-                        )
+                        ({describeRelation(player.relations?.coach ?? 50)})
                       </span>
                     </span>
                     <Bar value={player.relations?.coach ?? 50} />
@@ -687,8 +726,7 @@ function App() {
                 </p>
                 <p>
                   d20: {lastTestResult.roll} + atributo (
-                  {lastTestResult.attributeValue}) ={" "}
-                  {lastTestResult.total}
+                  {lastTestResult.attributeValue}) = {lastTestResult.total}
                 </p>
                 <p>
                   {lastTestResult.isCritSuccess
@@ -742,6 +780,28 @@ function describeRelation(value) {
   if (value >= 40) return "Neutra";
   if (value >= 20) return "Fraca";
   return "Péssima";
+}
+
+function xpForNext(level) {
+  // podes afinar depois: mais difícil nos níveis altos
+  return 100 + (level - 1) * 50;
+}
+
+function applyXp(player, xpGain) {
+  if (!xpGain || xpGain === 0) return player;
+
+  let level = player.level ?? 1;
+  let xp = (player.xp ?? 0) + xpGain;
+
+  let xpNeeded = xpForNext(level);
+
+  while (xp >= xpNeeded) {
+    xp -= xpNeeded;
+    level += 1;
+    xpNeeded = xpForNext(level);
+  }
+
+  return { ...player, level, xp };
 }
 
 function Bar({ value }) {

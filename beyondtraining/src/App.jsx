@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 import { scenes } from "./scenes";
+import AttributeRadar from "./AttributeRadar";
 
 const STORAGE_KEY = "beyondtraining_save_v1";
 
@@ -764,24 +765,19 @@ function App() {
 
                 <hr className="sidebar-divider" />
 
-                <h3>Atributos</h3>
-                <p>
-                  <strong>Remate:</strong> {player.attributes.remate}
+                <AttributeRadar attributes={player.attributes} />
+
+                <p className="attr-inline">
+                  <span>Remate: <strong>{player.attributes.remate}</strong></span>
+                  <span>Passe: <strong>{player.attributes.passe}</strong></span>
                 </p>
-                <p>
-                  <strong>Passe:</strong> {player.attributes.passe}
+                <p className="attr-inline">
+                  <span>Drible: <strong>{player.attributes.drible}</strong></span>
+                  <span>Velocidade: <strong>{player.attributes.velocidade}</strong></span>
                 </p>
-                <p>
-                  <strong>Drible:</strong> {player.attributes.drible}
-                </p>
-                <p>
-                  <strong>Velocidade:</strong> {player.attributes.velocidade}
-                </p>
-                <p>
-                  <strong>Resistência:</strong> {player.attributes.resistencia}
-                </p>
-                <p>
-                  <strong>Compostura:</strong> {player.attributes.compostura}
+                <p className="attr-inline">
+                  <span>Resistência: <strong>{player.attributes.resistencia}</strong></span>
+                  <span>Compostura: <strong>{player.attributes.compostura}</strong></span>
                 </p>
 
                 <hr className="sidebar-divider" />
@@ -1087,20 +1083,39 @@ function Delta({ change }) {
   return <span className={className}>{sign}{change}</span>;
 }
 
+function getAxisDescriptor(value) {
+  const v = value ?? 50;
+
+  if (v < 30) {
+    return { type: "left", label: "Tendência esquerda" };
+  }
+  if (v > 70) {
+    return { type: "right", label: "Tendência direita" };
+  }
+  return { type: "neutral", label: "Equilibrado" };
+}
+
 function AxisRow({ label, left, right, value }) {
   const pct = clamp(value ?? 50, 0, 100);
+  const { type, label: tagLabel } = getAxisDescriptor(pct);
+
   return (
     <div className="axis-row">
-      <div className="axis-header">
+      <div className="axis-header-line">
         <span className="axis-title">{label}</span>
+        <span className={`axis-tag axis-tag--${type}`}>{tagLabel}</span>
       </div>
-      <div className="axis-bar-wrapper">
+      <div className="axis-track">
         <span className="axis-end">{left}</span>
-        <Bar value={pct} />
+        <div className="axis-bar">
+          <div className="axis-bar-fill" style={{ width: `${pct}%` }} />
+          <div className="axis-handle" style={{ left: `${pct}%` }} />
+        </div>
         <span className="axis-end">{right}</span>
       </div>
     </div>
   );
 }
+
 
 export default App;

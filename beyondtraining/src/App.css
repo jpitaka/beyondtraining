@@ -634,23 +634,112 @@ body {
   }
 }
 .axis-row {
-  margin-top: 0.4rem;
+  margin-top: 0.6rem;
 }
 
-.axis-header {
+.axis-header-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-size: 0.75rem;
   color: #9ca3af;
-  margin-bottom: 0.15rem;
+  margin-bottom: 0.2rem;
 }
 
-.axis-bar-wrapper {
+.axis-title {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.axis-tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  border: 1px solid #4b5563;
+}
+
+.axis-tag--neutral {
+  background: rgba(15, 23, 42, 0.8);
+  color: #e5e7eb;
+  border-color: #4b5563;
+}
+
+.axis-tag--left {
+  background: rgba(127, 29, 29, 0.9);
+  color: #fecaca;
+  border-color: #f97316;
+}
+
+.axis-tag--right {
+  background: rgba(6, 78, 59, 0.9);
+  color: #bbf7d0;
+  border-color: #22c55e;
+}
+
+.axis-track {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.4rem;
 }
 
 .axis-end {
+  width: 80px;
   font-size: 0.7rem;
   color: #6b7280;
-  width: 80px;
+}
+
+.axis-bar {
+  position: relative;
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(to right, #111827, #020617);
+  overflow: hidden;
+}
+
+.axis-bar-fill {
+  position: absolute;
+  inset: 0;
+  width: 50%;
+  border-radius: 999px;
+  background: linear-gradient(to right, #22c55e, #a3e635);
+}
+
+.axis-handle {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #f9fafb;
+  box-shadow: 0 0 8px rgba(15, 23, 42, 0.7);
+}
+
+.radar-card {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background: radial-gradient(circle at top, #020617, #020617);
+  border: 1px solid #1f2937;
+}
+
+.radar-card h3 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+  margin-bottom: 0.4rem;
+}
+
+.radar-wrapper {
+  width: 100%;
+  height: 200px;
+}
+
+.attr-inline {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #d1d5db;
 }

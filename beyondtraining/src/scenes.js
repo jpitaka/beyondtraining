@@ -8,12 +8,19 @@ export const scenes = {
         label: "Olho-o nos olhos: «Pode contar comigo hoje, mister.»",
         next: "confiante",
         effects: { morale: +10 },
+        relationEffects: {
+          coach: +5,
+          team: +2,
+        },
       },
       {
         id: "ficar_calado",
         label: "Fico calado e limito-me a acenar com a cabeça.",
         next: "calado",
         effects: { morale: -5 },
+        relationEffects: {
+          coach: -2,
+        },
       },
     ],
   },
@@ -57,6 +64,9 @@ export const scenes = {
         label: "Procurar a tua família na bancada e acenar discretamente.",
         next: "primeira_chance",
         effects: { morale: +5 },
+        relationEffects: {
+          fans: +3,
+        },
       },
     ],
   },
@@ -81,6 +91,10 @@ export const scenes = {
         label: "Jogar pelo seguro e soltar no colega melhor posicionado.",
         next: "fim_demo",
         effects: { morale: -2 },
+        relationEffects: {
+          team: +4,
+          fans: -2,
+        },
       },
     ],
   },
@@ -94,6 +108,11 @@ export const scenes = {
         label: "Saborear o momento e voltar a focar no jogo.",
         next: "fim_demo",
         effects: { morale: +10 },
+        relationEffects: {
+          coach: +4,
+          fans: +8,
+          media: +5,
+        },
       },
     ],
   },
@@ -104,14 +123,19 @@ export const scenes = {
     options: [
       {
         id: "seguir_fim_falha",
-        label: "Bater no peito, levantar a mão e prometer a ti próprio fazer melhor.",
+        label:
+          "Bater no peito, levantar a mão e prometer a ti próprio fazer melhor.",
         next: "fim_demo",
         effects: { morale: +2, stamina: -5 },
+        relationEffects: {
+          fans: +1, // respeitam o esforço
+          coach: -1,
+        },
       },
     ],
   },
 
-    fim_demo: {
+  fim_demo: {
     title: "Fim do jogo",
     text: "O árbitro apita para o final. Mais uma página escrita na tua carreira. Amanhã já se pensa na próxima semana.",
     options: [

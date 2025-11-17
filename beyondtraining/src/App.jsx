@@ -121,8 +121,15 @@ function criarJogadorInicial(formData) {
     morale: clamp(morale, 0, 100),
     stamina: clamp(stamina, 0, 100),
     attributes: { ...baseStats },
+    relations: {
+      coach: 60, // treinador
+      team: 50,  // colegas
+      fans: 40,  // adeptos
+      media: 40, // imprensa
+    },
   };
 }
+
 
 function App() {
   // 'characterCreation' | 'weekHub' | 'game'
@@ -214,11 +221,22 @@ function App() {
       if (option.reset) return prev;
 
       const effects = option.effects || {};
+      const relationEffects = option.relationEffects || {};
+
       const morale = clamp(prev.morale + (effects.morale ?? 0), 0, 100);
       const stamina = clamp(prev.stamina + (effects.stamina ?? 0), 0, 100);
 
-      return { ...prev, morale, stamina };
+      const relations = { ...(prev.relations || {}) };
+
+      for (const key of Object.keys(relationEffects)) {
+        const current = relations[key] ?? 50;
+        const change = relationEffects[key];
+        relations[key] = clamp(current + change, 0, 100);
+      }
+
+      return { ...prev, morale, stamina, relations };
     });
+
 
     let nextId = option.next ?? currentSceneId;
 
@@ -539,6 +557,38 @@ function App() {
                 <p>
                   <strong>Compostura:</strong> {player.attributes.compostura}
                 </p>
+                                <hr className="sidebar-divider" />
+
+                <h3>Relações</h3>
+                <p>
+                  <strong>Treinador:</strong>{" "}
+                  {player.relations?.coach ?? 50}{" "}
+                  <span className="relation-label">
+                    ({describeRelation(player.relations?.coach ?? 50)})
+                  </span>
+                </p>
+                <p>
+                  <strong>Equipa:</strong>{" "}
+                  {player.relations?.team ?? 50}{" "}
+                  <span className="relation-label">
+                    ({describeRelation(player.relations?.team ?? 50)})
+                  </span>
+                </p>
+                <p>
+                  <strong>Adeptos:</strong>{" "}
+                  {player.relations?.fans ?? 50}{" "}
+                  <span className="relation-label">
+                    ({describeRelation(player.relations?.fans ?? 50)})
+                  </span>
+                </p>
+                <p>
+                  <strong>Imprensa:</strong>{" "}
+                  {player.relations?.media ?? 50}{" "}
+                  <span className="relation-label">
+                    ({describeRelation(player.relations?.media ?? 50)})
+                  </span>
+                </p>
+
               </>
             )}
           </aside>
@@ -606,6 +656,14 @@ function runTest(test, player) {
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
+}
+
+function describeRelation(value) {
+  if (value >= 80) return "Excelente";
+  if (value >= 60) return "Boa";
+  if (value >= 40) return "Neutra";
+  if (value >= 20) return "Fraca";
+  return "Péssima";
 }
 
 export default App;

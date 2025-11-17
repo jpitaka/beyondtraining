@@ -378,3 +378,8 @@ body {
 .test-result--fail {
   border-color: #dc2626;
 }
+
+.relation-label {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}

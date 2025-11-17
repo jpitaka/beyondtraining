@@ -122,14 +122,13 @@ function criarJogadorInicial(formData) {
     stamina: clamp(stamina, 0, 100),
     attributes: { ...baseStats },
     relations: {
-      coach: 60, // treinador
-      team: 50,  // colegas
-      fans: 40,  // adeptos
-      media: 40, // imprensa
+      coach: 60,
+      team: 50,
+      fans: 40,
+      media: 40,
     },
   };
 }
-
 
 function App() {
   // 'characterCreation' | 'weekHub' | 'game'
@@ -147,10 +146,11 @@ function App() {
 
   const [player, setPlayer] = useState(null);
   const [lastTestResult, setLastTestResult] = useState(null);
+  const [lastDelta, setLastDelta] = useState(null);
 
   const scene = scenes[currentSceneId];
 
-  // 1) Carregar jogo guardado (se existir) quando a app arranca
+  // carregar save
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -164,12 +164,13 @@ function App() {
       setCurrentSceneId(data.currentSceneId || "inicio");
       setWeek(data.week || 1);
       setLastTestResult(null);
+      setLastDelta(null);
     } catch (err) {
       console.warn("Falha a carregar save:", err);
     }
   }, []);
 
-  // 2) Guardar jogo sempre que coisas importantes mudam
+  // guardar save
   useEffect(() => {
     if (!player) {
       localStorage.removeItem(STORAGE_KEY);
@@ -193,9 +194,10 @@ function App() {
   const handleOptionClick = (option) => {
     if (!player) return;
 
-    // sair do jogo e voltar ao hub da semana
+    // ir para hub da semana
     if (option.goToWeekHub) {
       setLastTestResult(null);
+      setLastDelta(null);
       setWeek((prev) => prev + 1);
       setCurrentSceneId("inicio");
       setScreen("weekHub");
@@ -215,13 +217,13 @@ function App() {
       setLastTestResult(null);
     }
 
+    const effects = option.effects || {};
+    const relationEffects = option.relationEffects || {};
+
     setPlayer((prev) => {
       if (!prev) return prev;
 
       if (option.reset) return prev;
-
-      const effects = option.effects || {};
-      const relationEffects = option.relationEffects || {};
 
       const morale = clamp(prev.morale + (effects.morale ?? 0), 0, 100);
       const stamina = clamp(prev.stamina + (effects.stamina ?? 0), 0, 100);
@@ -237,6 +239,12 @@ function App() {
       return { ...prev, morale, stamina, relations };
     });
 
+    // guardar último delta para mostrar ao lado das barras
+    setLastDelta({
+      moraleChange: effects.morale ?? 0,
+      staminaChange: effects.stamina ?? 0,
+      relationsChange: relationEffects,
+    });
 
     let nextId = option.next ?? currentSceneId;
 
@@ -267,11 +275,15 @@ function App() {
     setWeek(1);
     setCurrentSceneId("inicio");
     setLastTestResult(null);
+    setLastDelta(null);
     setScreen("weekHub");
   };
 
   const handleTrainingChoice = (type) => {
     if (!player) return;
+
+    let staminaChange = 0;
+    let moraleChange = 0;
 
     setPlayer((prev) => {
       if (!prev) return prev;
@@ -282,23 +294,34 @@ function App() {
       };
 
       if (type === "fisico") {
-        updated.stamina = clamp(prev.stamina + 10, 0, 100);
-        updated.morale = clamp(prev.morale - 5, 0, 100);
+        staminaChange = +10;
+        moraleChange = -5;
+        updated.stamina = clamp(prev.stamina + staminaChange, 0, 100);
+        updated.morale = clamp(prev.morale + moraleChange, 0, 100);
         updated.attributes.resistencia = (prev.attributes.resistencia || 0) + 1;
       } else if (type === "tecnico") {
-        updated.stamina = clamp(prev.stamina - 5, 0, 100);
-        updated.morale = clamp(prev.morale + 5, 0, 100);
+        staminaChange = -5;
+        moraleChange = +5;
+        updated.stamina = clamp(prev.stamina + staminaChange, 0, 100);
+        updated.morale = clamp(prev.morale + moraleChange, 0, 100);
         updated.attributes.remate = (prev.attributes.remate || 0) + 1;
         updated.attributes.passe = (prev.attributes.passe || 0) + 1;
       } else if (type === "descanso") {
-        updated.stamina = clamp(prev.stamina + 15, 0, 100);
-        updated.morale = clamp(prev.morale + 5, 0, 100);
+        staminaChange = +15;
+        moraleChange = +5;
+        updated.stamina = clamp(prev.stamina + staminaChange, 0, 100);
+        updated.morale = clamp(prev.morale + moraleChange, 0, 100);
       }
 
       return updated;
     });
 
     setLastTestResult(null);
+    setLastDelta({
+      moraleChange,
+      staminaChange,
+      relationsChange: {},
+    });
     setCurrentSceneId("inicio");
     setScreen("game");
   };
@@ -314,6 +337,7 @@ function App() {
     setCurrentSceneId("inicio");
     setWeek(1);
     setLastTestResult(null);
+    setLastDelta(null);
     setFormData({
       name: "",
       nickname: "",
@@ -331,9 +355,30 @@ function App() {
         <div className="header-right">
           {player && (
             <div className="status-bar">
-              <span>Semana: {week}</span>
-              <span>Condição Física: {player.stamina}</span>
-              <span>Moral: {player.morale}</span>
+              <div className="status-item">
+                <span className="status-label">Semana</span>
+                <div className="status-row">
+                  <span className="status-value">{week}</span>
+                </div>
+              </div>
+
+              <div className="status-item">
+                <span className="status-label">Condição Física</span>
+                <div className="status-row">
+                  <span className="status-value">{player.stamina}</span>
+                  <Bar value={player.stamina} />
+                  <Delta change={lastDelta?.staminaChange ?? 0} />
+                </div>
+              </div>
+
+              <div className="status-item">
+                <span className="status-label">Moral</span>
+                <div className="status-row">
+                  <span className="status-value">{player.morale}</span>
+                  <Bar value={player.morale} />
+                  <Delta change={lastDelta?.moraleChange ?? 0} />
+                </div>
+              </div>
             </div>
           )}
 
@@ -557,38 +602,70 @@ function App() {
                 <p>
                   <strong>Compostura:</strong> {player.attributes.compostura}
                 </p>
-                                <hr className="sidebar-divider" />
+
+                <hr className="sidebar-divider" />
 
                 <h3>Relações</h3>
-                <p>
-                  <strong>Treinador:</strong>{" "}
-                  {player.relations?.coach ?? 50}{" "}
-                  <span className="relation-label">
-                    ({describeRelation(player.relations?.coach ?? 50)})
-                  </span>
-                </p>
-                <p>
-                  <strong>Equipa:</strong>{" "}
-                  {player.relations?.team ?? 50}{" "}
-                  <span className="relation-label">
-                    ({describeRelation(player.relations?.team ?? 50)})
-                  </span>
-                </p>
-                <p>
-                  <strong>Adeptos:</strong>{" "}
-                  {player.relations?.fans ?? 50}{" "}
-                  <span className="relation-label">
-                    ({describeRelation(player.relations?.fans ?? 50)})
-                  </span>
-                </p>
-                <p>
-                  <strong>Imprensa:</strong>{" "}
-                  {player.relations?.media ?? 50}{" "}
-                  <span className="relation-label">
-                    ({describeRelation(player.relations?.media ?? 50)})
-                  </span>
-                </p>
 
+                <div className="relation-row">
+                  <span className="relation-name">Treinador</span>
+                  <div className="relation-main">
+                    <span className="relation-value">
+                      {player.relations?.coach ?? 50}{" "}
+                      <span className="relation-label">
+                        (
+                        {describeRelation(player.relations?.coach ?? 50)}
+                        )
+                      </span>
+                    </span>
+                    <Bar value={player.relations?.coach ?? 50} />
+                    <Delta
+                      change={lastDelta?.relationsChange?.coach ?? 0}
+                    />
+                  </div>
+                </div>
+
+                <div className="relation-row">
+                  <span className="relation-name">Equipa</span>
+                  <div className="relation-main">
+                    <span className="relation-value">
+                      {player.relations?.team ?? 50}{" "}
+                      <span className="relation-label">
+                        ({describeRelation(player.relations?.team ?? 50)})
+                      </span>
+                    </span>
+                    <Bar value={player.relations?.team ?? 50} />
+                    <Delta change={lastDelta?.relationsChange?.team ?? 0} />
+                  </div>
+                </div>
+
+                <div className="relation-row">
+                  <span className="relation-name">Adeptos</span>
+                  <div className="relation-main">
+                    <span className="relation-value">
+                      {player.relations?.fans ?? 50}{" "}
+                      <span className="relation-label">
+                        ({describeRelation(player.relations?.fans ?? 50)})
+                      </span>
+                    </span>
+                    <Bar value={player.relations?.fans ?? 50} />
+                    <Delta change={lastDelta?.relationsChange?.fans ?? 0} />
+                  </div>
+                </div>
+
+                <div className="relation-row">
+                  <span className="relation-name">Imprensa</span>
+                  <div className="relation-main">
+                    <span className="relation-value">
+                      {player.relations?.media ?? 50}{" "}
+                      <span className="relation-label">
+                        ({describeRelation(player.relations?.media ?? 50)})
+                      </span>
+                    </span>
+                    <Bar value={player.relations?.media ?? 50} />
+                    <Delta change={lastDelta?.relationsChange?.media ?? 0} />
+                  </div>
+                </div>
               </>
             )}
           </aside>
@@ -610,7 +687,8 @@ function App() {
                 </p>
                 <p>
                   d20: {lastTestResult.roll} + atributo (
-                  {lastTestResult.attributeValue}) = {lastTestResult.total}
+                  {lastTestResult.attributeValue}) ={" "}
+                  {lastTestResult.total}
                 </p>
                 <p>
                   {lastTestResult.isCritSuccess
@@ -664,6 +742,24 @@ function describeRelation(value) {
   if (value >= 40) return "Neutra";
   if (value >= 20) return "Fraca";
   return "Péssima";
+}
+
+function Bar({ value }) {
+  const pct = clamp(value ?? 0, 0, 100);
+  return (
+    <div className="bar">
+      <div className="bar-fill" style={{ width: `${pct}%` }} />
+    </div>
+  );
+}
+
+function Delta({ change }) {
+  if (!change || change === 0) return null;
+  const sign = change > 0 ? "+" : "";
+  const className =
+    change > 0 ? "delta delta--pos" : "delta delta--neg";
+
+  return <span className={className}>{sign}{change}</span>;
 }
 
 export default App;

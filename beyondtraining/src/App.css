@@ -38,6 +38,62 @@ body {
   gap: 1rem;
 }
 
+.status-bar {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-end;
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 140px;
+}
+
+.status-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.status-value {
+  font-size: 0.9rem;
+  min-width: 2ch;
+}
+
+.bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: #111827;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(to right, #22c55e, #2563eb);
+}
+
+.delta {
+  font-size: 0.8rem;
+}
+
+.delta--pos {
+  color: #22c55e;
+}
+
+.delta--neg {
+  color: #ef4444;
+}
+
 .reset-button {
   padding: 0.45rem 0.9rem;
   border-radius: 999px;
@@ -382,4 +438,22 @@ body {
 .relation-label {
   font-size: 0.8rem;
   color: #9ca3af;
+}
+
+.relation-row {
+  margin-top: 0.4rem;
+}
+
+.relation-name {
+  font-size: 0.85rem;
+}
+
+.relation-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.relation-value {
+  font-size: 0.85rem;
 }

@@ -80,6 +80,7 @@ export const scenes = {
   primeira_chance: {
     title: "Primeira Oportunidade",
     text: "Ainda na primeira parte, a bola sobra para ti à entrada da área. Tens espaço durante um segundo, antes de o defesa fechar.",
+    // BOTÕES (continuam a existir, para já)
     options: [
       {
         id: "rematar_baliza",
@@ -96,6 +97,71 @@ export const scenes = {
       {
         id: "passe_seguro",
         label: "Jogar pelo seguro e soltar no colega melhor posicionado.",
+        next: "fim_demo",
+        effects: { morale: -2 },
+        relationEffects: {
+          team: +4,
+          fans: -2,
+        },
+        xp: 15,
+      },
+    ],
+    // INTENTS PARA TEXTO LIVRE
+    intents: [
+      {
+        id: "rematar_intent",
+        label: "Rematar à baliza",
+        keywords: [
+          "remato",
+          "rematar",
+          "remate",
+          "chuto",
+          "chutar",
+          "disparo",
+          "atirar à baliza",
+          "remato à baliza",
+        ],
+        test: {
+          attribute: "remate",
+          dc: 14,
+          description: "Remate à entrada da área",
+        },
+        nextOnSuccess: "remate_sucesso",
+        nextOnFailure: "remate_falha",
+        xp: 20,
+      },
+      {
+        id: "drible_intent",
+        label: "Driblar o defesa",
+        keywords: [
+          "driblo",
+          "driblar",
+          "finto",
+          "fintar",
+          "tento passar",
+          "passo pelo defesa",
+          "vou para cima dele",
+        ],
+        test: {
+          attribute: "drible",
+          dc: 13,
+          description: "Drible ao defesa",
+        },
+        nextOnSuccess: "drible_sucesso",
+        nextOnFailure: "drible_falha",
+        xp: 20,
+      },
+      {
+        id: "passe_intent",
+        label: "Passe para o colega",
+        keywords: [
+          "passe",
+          "passo",
+          "passar a bola",
+          "toco no colega",
+          "solto a bola",
+          "jogar pelo seguro",
+        ],
         next: "fim_demo",
         effects: { morale: -2 },
         relationEffects: {
@@ -141,6 +207,44 @@ export const scenes = {
           coach: -1,
         },
         xp: 20,
+      },
+    ],
+  },
+
+  drible_sucesso: {
+    title: "Defesa Ficou para Trás",
+    text: "Levas a bola colada ao pé, finges ir para fora, cortas para dentro e deixas o defesa sentado. O estádio levanta-se com um ‘oooooh’.",
+    options: [
+      {
+        id: "drible_sucesso_continua",
+        label: "Aproveitar o embalo e seguir a jogada.",
+        next: "fim_demo",
+        effects: { morale: +8, stamina: -3 },
+        relationEffects: {
+          team: +5,
+          fans: +6,
+          coach: +2,
+        },
+        xp: 25,
+      },
+    ],
+  },
+
+  drible_falha: {
+    title: "Perda de Bola",
+    text: "Tentaste a finta, mas o defesa lê bem o lance e rouba-te a bola. Sentes um misto de frustração e teimosia a ferver por dentro.",
+    options: [
+      {
+        id: "drible_falha_reacao",
+        label:
+          "Recuperar posição rapidamente e tentar compensar na defesa.",
+        next: "fim_demo",
+        effects: { stamina: -5 },
+        relationEffects: {
+          coach: +1,
+          fans: -2,
+        },
+        xp: 15,
       },
     ],
   },

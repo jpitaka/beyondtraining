@@ -463,3 +463,67 @@ body {
 .relation-value {
   font-size: 0.85rem;
 }
+
+.free-action {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid #111827;
+  background: #020617;
+}
+
+.free-action label {
+  display: block;
+  font-size: 0.8rem;
+  margin-bottom: 0.35rem;
+  color: #e5e7eb;
+}
+
+.free-action textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 48px;
+  max-height: 120px;
+  padding: 0.5rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #1f2937;
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 0.85rem;
+}
+
+.free-action textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px #2563eb;
+}
+
+.free-action-button {
+  margin-top: 0.5rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid #2563eb;
+  background: #1d4ed8;
+  color: #e5e7eb;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.free-action-button:hover {
+  background: #1e40af;
+}
+
+.free-action-feedback {
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  color: #e5e7eb;
+}
+
+.free-action-hint {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}

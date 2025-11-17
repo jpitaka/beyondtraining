@@ -128,13 +128,12 @@ function criarJogadorInicial(formData) {
       media: 40,
     },
     level: 1,
-    xp: 0, // XP atual neste nível
+    xp: 0,
   };
 }
 
 function App() {
-  // 'characterCreation' | 'weekHub' | 'game'
-  const [screen, setScreen] = useState("characterCreation");
+  const [screen, setScreen] = useState("characterCreation"); // 'characterCreation' | 'weekHub' | 'game'
   const [currentSceneId, setCurrentSceneId] = useState("inicio");
   const [week, setWeek] = useState(1);
 
@@ -149,6 +148,9 @@ function App() {
   const [player, setPlayer] = useState(null);
   const [lastTestResult, setLastTestResult] = useState(null);
   const [lastDelta, setLastDelta] = useState(null);
+
+  const [freeActionText, setFreeActionText] = useState("");
+  const [freeActionFeedback, setFreeActionFeedback] = useState("");
 
   const scene = scenes[currentSceneId];
 
@@ -167,6 +169,8 @@ function App() {
       setWeek(data.week || 1);
       setLastTestResult(null);
       setLastDelta(null);
+      setFreeActionText("");
+      setFreeActionFeedback("");
     } catch (err) {
       console.warn("Falha a carregar save:", err);
     }
@@ -196,16 +200,6 @@ function App() {
   const handleOptionClick = (option) => {
     if (!player) return;
 
-    // ir para hub da semana
-    if (option.goToWeekHub) {
-      setLastTestResult(null);
-      setLastDelta(null);
-      setWeek((prev) => prev + 1);
-      setCurrentSceneId("inicio");
-      setScreen("weekHub");
-      return;
-    }
-
     let testResult = null;
 
     if (option.test) {
@@ -227,13 +221,12 @@ function App() {
       if (!prev) return prev;
       if (option.reset) return prev;
 
-      // começar por copiar
       let updated = {
         ...prev,
         relations: { ...(prev.relations || {}) },
       };
 
-      // aplicar XP e possíveis subidas de nível
+      // XP + nível
       updated = applyXp(updated, xpGain);
 
       // CF / Moral
@@ -252,7 +245,6 @@ function App() {
       return updated;
     });
 
-    // guardar último delta para mostrar ao lado das barras
     setLastDelta({
       moraleChange: effects.morale ?? 0,
       staminaChange: effects.stamina ?? 0,
@@ -270,7 +262,49 @@ function App() {
       }
     }
 
+    if (option.goToWeekHub) {
+      setLastTestResult(null);
+      setFreeActionText("");
+      // podes manter o feedback da última ação se quiseres
+      setCurrentSceneId("inicio");
+      setScreen("weekHub");
+      setWeek((prev) => prev + 1);
+      return;
+    }
+
     setCurrentSceneId(nextId);
+  };
+
+  const handleFreeActionSubmit = () => {
+    if (!player) return;
+
+    const text = freeActionText.trim();
+    if (!text) {
+      setFreeActionFeedback("Escreve o que queres fazer em campo.");
+      return;
+    }
+
+    const currentScene = scenes[currentSceneId];
+    if (!currentScene || !Array.isArray(currentScene.intents)) {
+      setFreeActionFeedback(
+        "Neste momento tens de escolher uma das opções disponíveis."
+      );
+      return;
+    }
+
+    const intent = findIntentForText(currentScene, text);
+    if (!intent) {
+      setFreeActionFeedback(
+        "Não percebi bem a tua decisão. Tenta usar verbos simples como \"rematar\", \"driblar\" ou \"passar\"."
+      );
+      return;
+    }
+
+    const label = intent.label || intent.id || "ação";
+    setFreeActionFeedback(`Interpretei como: ${label}.`);
+
+    handleOptionClick(intent);
+    setFreeActionText("");
   };
 
   const handleFormChange = (event) => {
@@ -290,6 +324,8 @@ function App() {
     setCurrentSceneId("inicio");
     setLastTestResult(null);
     setLastDelta(null);
+    setFreeActionText("");
+    setFreeActionFeedback("");
     setScreen("weekHub");
   };
 
@@ -345,6 +381,8 @@ function App() {
       xpChange: xpGain,
     });
 
+    setFreeActionText("");
+    setFreeActionFeedback("");
     setCurrentSceneId("inicio");
     setScreen("game");
   };
@@ -361,6 +399,8 @@ function App() {
     setWeek(1);
     setLastTestResult(null);
     setLastDelta(null);
+    setFreeActionText("");
+    setFreeActionFeedback("");
     setFormData({
       name: "",
       nickname: "",
@@ -740,6 +780,35 @@ function App() {
               </div>
             )}
 
+            {/* Caixa de texto para decisões livres */}
+            <div className="free-action">
+              <label htmlFor="free-action-input">
+                Escreve o que queres fazer nesta jogada:
+              </label>
+              <textarea
+                id="free-action-input"
+                rows={2}
+                value={freeActionText}
+                onChange={(e) => setFreeActionText(e.target.value)}
+                placeholder='Ex.: "Remato em força ao canto", "Tento driblar o defesa", "Faço o passe seguro".'
+              />
+              <button
+                type="button"
+                className="free-action-button"
+                onClick={handleFreeActionSubmit}
+              >
+                Confirmar decisão
+              </button>
+              {freeActionFeedback && (
+                <p className="free-action-feedback">{freeActionFeedback}</p>
+              )}
+              {scene.intents && (
+                <p className="free-action-hint">
+                  Dica: usa verbos simples como rematar, driblar, passar.
+                </p>
+              )}
+            </div>
+
             <div className="options">
               {scene.options.map((option) => (
                 <button
@@ -783,7 +852,6 @@ function describeRelation(value) {
 }
 
 function xpForNext(level) {
-  // podes afinar depois: mais difícil nos níveis altos
   return 100 + (level - 1) * 50;
 }
 
@@ -802,6 +870,21 @@ function applyXp(player, xpGain) {
   }
 
   return { ...player, level, xp };
+}
+
+function findIntentForText(scene, text) {
+  if (!scene || !Array.isArray(scene.intents)) return null;
+  const normalized = text.toLowerCase();
+
+  for (const intent of scene.intents) {
+    if (!intent.keywords) continue;
+    for (const kw of intent.keywords) {
+      if (normalized.includes(kw.toLowerCase())) {
+        return intent;
+      }
+    }
+  }
+  return null;
 }
 
 function Bar({ value }) {

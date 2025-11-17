@@ -157,6 +157,10 @@ export const scenes = {
           equipa: +4,
           humildade: +2
         },
+        matchImpact: {
+          ratingDelta: 0,
+          keyPasses: 1
+        },
         xp: 15
       }
     ],
@@ -182,6 +186,10 @@ export const scenes = {
           calma: +2,
           equipa: +2
         },
+        matchImpact: {
+          ratingDelta: 2,
+          goals: 1
+        },
         xp: 30
       }
     ]
@@ -204,6 +212,10 @@ export const scenes = {
         personalityEffects: {
           calma: +1,
           profissionalismo: +2
+        },
+        matchImpact: {
+          ratingDelta: -1,
+          bigChancesMissed: 1
         },
         xp: 20
       }
@@ -228,6 +240,10 @@ export const scenes = {
           humildade: -3,
           equipa: +1
         },
+        matchImpact: {
+          ratingDelta: 1,
+          keyPasses: 1
+        },
         xp: 25
       }
     ]
@@ -250,6 +266,9 @@ export const scenes = {
         personalityEffects: {
           equipa: +2,
           calma: +1
+        },
+        matchImpact: {
+          ratingDelta: -1
         },
         xp: 15
       }

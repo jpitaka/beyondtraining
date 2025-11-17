@@ -165,6 +165,15 @@ function App() {
   const [freeActionText, setFreeActionText] = useState("");
   const [freeActionFeedback, setFreeActionFeedback] = useState("");
 
+  // stats do jogo actual + resumo do último jogo
+  const [matchStats, setMatchStats] = useState({
+    ratingDelta: 0,
+    goals: 0,
+    bigChancesMissed: 0,
+    keyPasses: 0
+  });
+  const [lastMatchSummary, setLastMatchSummary] = useState(null);
+
   // estado do "dado"
   const [isRolling, setIsRolling] = useState(false);
   const [rollDisplay, setRollDisplay] = useState(null);
@@ -190,6 +199,15 @@ function App() {
       setScreen(data.screen || "weekHub");
       setCurrentSceneId(data.currentSceneId || "inicio");
       setWeek(data.week || 1);
+      setMatchStats(
+        data.matchStats || {
+          ratingDelta: 0,
+          goals: 0,
+          bigChancesMissed: 0,
+          keyPasses: 0
+        }
+      );
+      setLastMatchSummary(data.lastMatchSummary || null);
       setLastTestResult(null);
       setLastDelta(null);
       setFreeActionText("");
@@ -213,7 +231,9 @@ function App() {
       player,
       screen,
       currentSceneId,
-      week
+      week,
+      matchStats,
+      lastMatchSummary
     };
 
     try {
@@ -221,7 +241,7 @@ function App() {
     } catch (err) {
       console.warn("Falha a guardar save:", err);
     }
-  }, [player, screen, currentSceneId, week]);
+  }, [player, screen, currentSceneId, week, matchStats, lastMatchSummary]);
 
   // animação do "dado" (números a rodar)
   useEffect(() => {
@@ -288,6 +308,29 @@ function App() {
     const relationEffects = option.relationEffects || {};
     const personalityEffects = option.personalityEffects || {};
     const xpGain = option.xp ?? 0;
+    const impact = option.matchImpact || {};
+    const hadImpact =
+      impact.ratingDelta ||
+      impact.goals ||
+      impact.bigChancesMissed ||
+      impact.keyPasses;
+
+    const newMatchStats = hadImpact
+      ? {
+          ratingDelta:
+            (matchStats.ratingDelta || 0) + (impact.ratingDelta || 0),
+          goals: (matchStats.goals || 0) + (impact.goals || 0),
+          bigChancesMissed:
+            (matchStats.bigChancesMissed || 0) +
+            (impact.bigChancesMissed || 0),
+          keyPasses:
+            (matchStats.keyPasses || 0) + (impact.keyPasses || 0)
+        }
+      : matchStats;
+
+    if (hadImpact) {
+      setMatchStats(newMatchStats);
+    }
 
     setPlayer((prev) => {
       if (!prev) return prev;
@@ -345,6 +388,9 @@ function App() {
     }
 
     if (option.goToWeekHub) {
+      const resumo = criarResumoJogo(newMatchStats);
+      setLastMatchSummary(resumo);
+
       setFreeActionText("");
       setFreeActionFeedback("");
       setCurrentSceneId("inicio");
@@ -402,6 +448,13 @@ function App() {
     setPlayer(novoJogador);
     setWeek(1);
     setCurrentSceneId("inicio");
+    setMatchStats({
+      ratingDelta: 0,
+      goals: 0,
+      bigChancesMissed: 0,
+      keyPasses: 0
+    });
+    setLastMatchSummary(null);
     setLastTestResult(null);
     setLastDelta(null);
     setFreeActionText("");
@@ -478,6 +531,13 @@ function App() {
 
     setFreeActionText("");
     setFreeActionFeedback("");
+    setMatchStats({
+      ratingDelta: 0,
+      goals: 0,
+      bigChancesMissed: 0,
+      keyPasses: 0
+    });
+
     setCurrentSceneId("inicio");
     setScreen("game");
   };
@@ -488,6 +548,13 @@ function App() {
     }
 
     localStorage.removeItem(STORAGE_KEY);
+    setMatchStats({
+      ratingDelta: 0,
+      goals: 0,
+      bigChancesMissed: 0,
+      keyPasses: 0
+    });
+    setLastMatchSummary(null);
     setPlayer(null);
     setScreen("characterCreation");
     setCurrentSceneId("inicio");
@@ -672,6 +739,42 @@ function App() {
         </main>
       ) : screen === "weekHub" ? (
         <main className="content creation-content">
+          {lastMatchSummary && (
+            <section className="creation-card last-match-card">
+              <h2>Resumo do último jogo</h2>
+              <p className="creation-subtitle">
+                Como foi a tua exibição na última partida.
+              </p>
+
+              <div className="last-match-main">
+                <div className="last-match-rating">
+                  <span className="last-match-rating-value">
+                    {lastMatchSummary.rating}
+                  </span>
+                  <span className="last-match-rating-label">Nota</span>
+                </div>
+
+                <div className="last-match-details">
+                  <p>
+                    <strong>Golos:</strong> {lastMatchSummary.goals}
+                  </p>
+                  <p>
+                    <strong>Grandes oportunidades falhadas:</strong>{" "}
+                    {lastMatchSummary.bigChancesMissed}
+                  </p>
+                  <p>
+                    <strong>Passes-chave:</strong>{" "}
+                    {lastMatchSummary.keyPasses}
+                  </p>
+                </div>
+              </div>
+
+              <p className="last-match-comment">
+                {lastMatchSummary.comment}
+              </p>
+            </section>
+          )}
+
           <section className="creation-card week-card">
             <h2>Semana {week} – Treino</h2>
             <p className="creation-subtitle">
@@ -1028,6 +1131,38 @@ function applyXp(player, xpGain) {
   }
 
   return { ...player, level, xp };
+}
+function criarResumoJogo(stats) {
+  const base = 6; // nota base
+  const ratingRaw = base + (stats.ratingDelta || 0);
+  const rating = clamp(ratingRaw, 3, 10);
+
+  let comment;
+
+  if ((stats.goals || 0) >= 2) {
+    comment = "Exibição de craque: decisivo com vários golos.";
+  } else if (stats.goals === 1) {
+    comment = "Bom jogo, coroado com um golo importante.";
+  } else if ((stats.bigChancesMissed || 0) >= 1) {
+    comment = "Jogo misto: apareceu bem, mas falhou uma grande oportunidade.";
+  } else if ((stats.keyPasses || 0) >= 2) {
+    comment =
+      "Jogo muito útil, a criar várias jogadas perigosas para a equipa.";
+  } else if ((stats.keyPasses || 0) === 1) {
+    comment = "Jogo sólido, a ligar bem o jogo e a servir os colegas.";
+  } else if ((stats.ratingDelta || 0) <= -2) {
+    comment = "Dia difícil: pouco inspirado e com vários erros relevantes.";
+  } else {
+    comment = "Exibição razoável, sem grandes destaques.";
+  }
+
+  return {
+    rating: rating.toFixed(1),
+    goals: stats.goals || 0,
+    bigChancesMissed: stats.bigChancesMissed || 0,
+    keyPasses: stats.keyPasses || 0,
+    comment
+  };
 }
 
 // escolhe a intent com mais keywords que batem

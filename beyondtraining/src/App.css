@@ -743,3 +743,49 @@ body {
   font-size: 0.75rem;
   color: #d1d5db;
 }
+
+.last-match-card {
+  margin-bottom: 0.75rem;
+}
+
+.last-match-main {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.last-match-rating {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.6rem 0.9rem;
+  border-radius: 0.75rem;
+  background: radial-gradient(circle at top, #0f172a, #020617);
+  border: 1px solid #4b5563;
+}
+
+.last-match-rating-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #f9fafb;
+}
+
+.last-match-rating-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+}
+
+.last-match-details {
+  font-size: 0.8rem;
+  color: #e5e7eb;
+}
+
+.last-match-comment {
+  font-size: 0.8rem;
+  color: #e5e7eb;
+  margin-top: 0.25rem;
+}

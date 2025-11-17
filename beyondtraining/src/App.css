@@ -536,3 +536,100 @@ body {
   letter-spacing: 0.08em;
   color: #9ca3af;
 }
+
+.roll-overlay {
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.roll-box {
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  background: radial-gradient(circle at top, #1f2937, #020617);
+  border: 1px solid #4b5563;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  animation: roll-pulse 0.8s infinite alternate;
+}
+
+.roll-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #9ca3af;
+}
+
+.roll-number {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+/* animação do “dado” a respirar */
+@keyframes roll-pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+}
+
+/* resultado do teste com animações diferentes */
+
+.test-result--normal-success {
+  border-color: #22c55e;
+}
+
+.test-result--normal-fail {
+  border-color: #ef4444;
+}
+
+.test-result--crit-success {
+  border-color: #22c55e;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+  animation: crit-pop 0.5s ease-out;
+}
+
+.test-result--crit-fail {
+  border-color: #ef4444;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+  animation: crit-shake 0.5s ease-out;
+}
+
+@keyframes crit-pop {
+  0% {
+    transform: scale(0.9);
+  }
+  60% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes crit-shake {
+  0% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-3px);
+  }
+  40% {
+    transform: translateX(3px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}

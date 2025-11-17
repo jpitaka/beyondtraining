@@ -152,6 +152,11 @@ function App() {
   const [freeActionText, setFreeActionText] = useState("");
   const [freeActionFeedback, setFreeActionFeedback] = useState("");
 
+  // estado do "dado"
+  const [isRolling, setIsRolling] = useState(false);
+  const [rollDisplay, setRollDisplay] = useState(null);
+  const [pendingAction, setPendingAction] = useState(null); // { option, testResult }
+
   const scene = scenes[currentSceneId];
 
   // carregar save
@@ -171,6 +176,9 @@ function App() {
       setLastDelta(null);
       setFreeActionText("");
       setFreeActionFeedback("");
+      setIsRolling(false);
+      setRollDisplay(null);
+      setPendingAction(null);
     } catch (err) {
       console.warn("Falha a carregar save:", err);
     }
@@ -197,21 +205,109 @@ function App() {
     }
   }, [player, screen, currentSceneId, week]);
 
+  // animação do "dado" (números a rodar)
+  useEffect(() => {
+    if (!isRolling || !pendingAction) return;
+
+    let ticks = 0;
+    const maxTicks = 15; // ~1.2s
+
+    const interval = setInterval(() => {
+      ticks++;
+      if (ticks >= maxTicks) {
+        clearInterval(interval);
+        const final = pendingAction.testResult.roll;
+        setRollDisplay(final);
+        // pequena pausa para "cair" o número
+        setTimeout(() => {
+          finalizarRoll(pendingAction);
+        }, 400);
+      } else {
+        const randomValue = Math.floor(Math.random() * 20) + 1;
+        setRollDisplay(randomValue);
+      }
+    }, 120);
+
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRolling, pendingAction]);
+
   const handleOptionClick = (option) => {
-    if (!player) return;
+    if (!player || isRolling) return;
 
-    let testResult = null;
+    // opções normais sem teste
+    if (!option.test) {
+      const effects = option.effects || {};
+      const relationEffects = option.relationEffects || {};
+      const xpGain = option.xp ?? 0;
 
-    if (option.test) {
-      testResult = runTest(option.test, player);
-      setLastTestResult({
-        ...testResult,
-        description: option.test.description || "Lance importante",
-        attribute: option.test.attribute
+      setPlayer((prev) => {
+        if (!prev) return prev;
+        if (option.reset) return prev;
+
+        let updated = {
+          ...prev,
+          relations: { ...(prev.relations || {}) }
+        };
+
+        updated = applyXp(updated, xpGain);
+
+        const morale = clamp(updated.morale + (effects.morale ?? 0), 0, 100);
+        const stamina = clamp(updated.stamina + (effects.stamina ?? 0), 0, 100);
+        updated.morale = morale;
+        updated.stamina = stamina;
+
+        for (const key of Object.keys(relationEffects)) {
+          const current = updated.relations[key] ?? 50;
+          const change = relationEffects[key];
+          updated.relations[key] = clamp(current + change, 0, 100);
+        }
+
+        return updated;
       });
-    } else {
+
+      setLastDelta({
+        moraleChange: effects.morale ?? 0,
+        staminaChange: effects.stamina ?? 0,
+        relationsChange: relationEffects,
+        xpChange: xpGain
+      });
+
       setLastTestResult(null);
+
+      let nextId = option.next ?? currentSceneId;
+
+      if (option.goToWeekHub) {
+        setLastTestResult(null);
+        setFreeActionText("");
+        setFreeActionFeedback("");
+        setCurrentSceneId("inicio");
+        setScreen("weekHub");
+        setWeek((prev) => prev + 1);
+        return;
+      }
+
+      setCurrentSceneId(nextId);
+      return;
     }
+
+    // opções com teste: começa animação de roll
+    const testResult = runTest(option.test, player);
+    setPendingAction({ option, testResult });
+    setIsRolling(true);
+    setRollDisplay(Math.floor(Math.random() * 20) + 1);
+    setLastTestResult(null);
+  };
+
+  const finalizarRoll = (action) => {
+    const { option, testResult } = action;
+
+    const extendedResult = {
+      ...testResult,
+      description: option.test.description || "Lance importante",
+      attribute: option.test.attribute
+    };
+    setLastTestResult(extendedResult);
 
     const effects = option.effects || {};
     const relationEffects = option.relationEffects || {};
@@ -226,16 +322,13 @@ function App() {
         relations: { ...(prev.relations || {}) }
       };
 
-      // XP + nível
       updated = applyXp(updated, xpGain);
 
-      // CF / Moral
       const morale = clamp(updated.morale + (effects.morale ?? 0), 0, 100);
       const stamina = clamp(updated.stamina + (effects.stamina ?? 0), 0, 100);
       updated.morale = morale;
       updated.stamina = stamina;
 
-      // relações
       for (const key of Object.keys(relationEffects)) {
         const current = updated.relations[key] ?? 50;
         const change = relationEffects[key];
@@ -253,29 +346,30 @@ function App() {
     });
 
     let nextId = option.next ?? currentSceneId;
-
-    if (option.test && testResult) {
-      if (testResult.success) {
-        nextId = option.nextOnSuccess ?? option.next ?? currentSceneId;
-      } else {
-        nextId = option.nextOnFailure ?? option.next ?? currentSceneId;
-      }
+    if (testResult.success) {
+      nextId = option.nextOnSuccess ?? option.next ?? currentSceneId;
+    } else {
+      nextId = option.nextOnFailure ?? option.next ?? currentSceneId;
     }
 
     if (option.goToWeekHub) {
-      setLastTestResult(null);
+      setLastTestResult(extendedResult);
       setFreeActionText("");
+      setFreeActionFeedback("");
       setCurrentSceneId("inicio");
       setScreen("weekHub");
       setWeek((prev) => prev + 1);
-      return;
+    } else {
+      setCurrentSceneId(nextId);
     }
 
-    setCurrentSceneId(nextId);
+    setIsRolling(false);
+    setRollDisplay(null);
+    setPendingAction(null);
   };
 
   const handleFreeActionSubmit = () => {
-    if (!player) return;
+    if (!player || isRolling) return;
 
     const text = freeActionText.trim();
     if (!text) {
@@ -325,11 +419,14 @@ function App() {
     setLastDelta(null);
     setFreeActionText("");
     setFreeActionFeedback("");
+    setIsRolling(false);
+    setRollDisplay(null);
+    setPendingAction(null);
     setScreen("weekHub");
   };
 
   const handleTrainingChoice = (type) => {
-    if (!player) return;
+    if (!player || isRolling) return;
 
     let staminaChange = 0;
     let moraleChange = 0;
@@ -400,6 +497,9 @@ function App() {
     setLastDelta(null);
     setFreeActionText("");
     setFreeActionFeedback("");
+    setIsRolling(false);
+    setRollDisplay(null);
+    setPendingAction(null);
     setFormData({
       name: "",
       nickname: "",
@@ -594,6 +694,7 @@ function App() {
               <button
                 className="week-option-button"
                 onClick={() => handleTrainingChoice("fisico")}
+                disabled={isRolling}
               >
                 <h3>Treino físico intenso</h3>
                 <p>
@@ -609,6 +710,7 @@ function App() {
               <button
                 className="week-option-button"
                 onClick={() => handleTrainingChoice("tecnico")}
+                disabled={isRolling}
               >
                 <h3>Treino técnico</h3>
                 <p>
@@ -623,6 +725,7 @@ function App() {
               <button
                 className="week-option-button"
                 onClick={() => handleTrainingChoice("descanso")}
+                disabled={isRolling}
               >
                 <h3>Recuperação e descanso</h3>
                 <p>
@@ -752,13 +855,23 @@ function App() {
             <h2>{scene.title}</h2>
             <p className="story-text">{scene.text}</p>
 
-            {lastTestResult && (
+            {/* UI do roll */}
+            {isRolling && (
+              <div className="roll-overlay">
+                <div className="roll-box">
+                  <div className="roll-label">Lançar d20...</div>
+                  <div className="roll-number">
+                    {rollDisplay ?? "?"}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {lastTestResult && !isRolling && (
               <div
-                className={`test-result ${
-                  lastTestResult.success
-                    ? "test-result--success"
-                    : "test-result--fail"
-                }`}
+                className={`test-result ${getTestResultClass(
+                  lastTestResult
+                )}`}
               >
                 <p>
                   <strong>{lastTestResult.description}</strong>
@@ -791,11 +904,13 @@ function App() {
                   value={freeActionText}
                   onChange={(e) => setFreeActionText(e.target.value)}
                   placeholder='Ex.: "Remato em força ao canto", "Tento driblar o defesa", "Faço o passe seguro".'
+                  disabled={isRolling}
                 />
                 <button
                   type="button"
                   className="free-action-button"
                   onClick={handleFreeActionSubmit}
+                  disabled={isRolling}
                 >
                   Confirmar decisão
                 </button>
@@ -810,7 +925,7 @@ function App() {
               </div>
             )}
 
-            {/* Sugestões rápidas (antigos botões) */}
+            {/* Sugestões rápidas */}
             {scene.options && scene.options.length > 0 && (
               <>
                 <h3 className="options-title">Sugestões rápidas</h3>
@@ -820,6 +935,7 @@ function App() {
                       key={option.id}
                       className="option-button"
                       onClick={() => handleOptionClick(option)}
+                      disabled={isRolling}
                     >
                       {option.label}
                     </button>
@@ -879,7 +995,7 @@ function applyXp(player, xpGain) {
   return { ...player, level, xp };
 }
 
-// Escolhe a intent com MAIS palavras-chave que aparecem no texto
+// escolhe a intent com mais keywords que batem
 function findIntentForText(scene, text) {
   if (!scene || !Array.isArray(scene.intents)) return null;
   const normalized = text.toLowerCase();
@@ -905,6 +1021,13 @@ function findIntentForText(scene, text) {
 
   if (bestScore === 0) return null;
   return bestIntent;
+}
+
+function getTestResultClass(result) {
+  if (result.isCritSuccess) return "test-result--crit-success";
+  if (result.isCritFail) return "test-result--crit-fail";
+  if (result.success) return "test-result--normal-success";
+  return "test-result--normal-fail";
 }
 
 function Bar({ value }) {

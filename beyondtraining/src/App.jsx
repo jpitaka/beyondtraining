@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import { scenes } from "./scenes";
 import AttributeRadar from "./AttributeRadar";
-import PlayerSidebar from "./PlayerSidebar";
+import EventPopup from "./EventPopup";
 
 const STORAGE_KEY = "beyondtraining_save_v1";
 
@@ -1062,6 +1062,13 @@ function App() {
               </div>
             </div>
           </section>
+          {currentEvent && (
+            <EventPopup
+              event={currentEvent}
+              onOptionClick={handleSocialOptionClick}
+              disabled={isRolling}
+            />
+          )}
         </main>
       )}
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import { scenes } from "./scenes";
 import AttributeRadar from "./AttributeRadar";
+import PlayerSidebar from "./PlayerSidebar";
 
 const STORAGE_KEY = "beyondtraining_save_v1";
 
@@ -375,7 +376,7 @@ function App() {
         updated.relations[key] = clamp(current + change, 0, 100);
       }
 
-      // personalidade
+            // personalidade
       for (const key of Object.keys(personalityEffects)) {
         if (!(key in updated.personality)) continue;
         const current = updated.personality[key] ?? 50;
@@ -611,6 +612,164 @@ function App() {
       ? clamp(((player.xp ?? 0) * 100) / xpNeeded, 0, 100)
       : 0;
 
+  const renderSidebar = () => (
+    <aside className="sidebar">
+      <h2>Ficha do Jogador</h2>
+      {player && (
+        <>
+          <p>
+            <strong>Nome:</strong>{" "}
+            {player.name}
+            {player.nickname ? ` "${player.nickname}"` : ""}
+          </p>
+          <p>
+            <strong>Posição:</strong> {player.position}
+          </p>
+          <p>
+            <strong>Clube:</strong> {player.club}
+          </p>
+          <p>
+            <strong>Backstory:</strong>{" "}
+            {
+              BACKSTORIES.find((b) => b.id === player.backstory)?.title ??
+              "N/A"
+            }
+          </p>
+
+          <hr className="sidebar-divider" />
+
+          <AttributeRadar attributes={player.attributes} />
+
+          <p className="attr-inline">
+            <span>
+              Remate: <strong>{player.attributes.remate}</strong>
+            </span>
+            <span>
+              Passe: <strong>{player.attributes.passe}</strong>
+            </span>
+          </p>
+          <p className="attr-inline">
+            <span>
+              Drible: <strong>{player.attributes.drible}</strong>
+            </span>
+            <span>
+              Velocidade: <strong>{player.attributes.velocidade}</strong>
+            </span>
+          </p>
+          <p className="attr-inline">
+            <span>
+              Resistência: <strong>{player.attributes.resistencia}</strong>
+            </span>
+            <span>
+              Compostura: <strong>{player.attributes.compostura}</strong>
+            </span>
+          </p>
+
+          <hr className="sidebar-divider" />
+
+          <h3>Relações</h3>
+
+          <div className="relation-row">
+            <span className="relation-name">Treinador</span>
+            <div className="relation-main">
+              <span className="relation-value">
+                {player.relations?.coach ?? 50}{" "}
+                <span className="relation-label">
+                  ({describeRelation(player.relations?.coach ?? 50)})
+                </span>
+              </span>
+              <Bar value={player.relations?.coach ?? 50} />
+              <Delta change={lastDelta?.relationsChange?.coach ?? 0} />
+            </div>
+          </div>
+
+          <div className="relation-row">
+            <span className="relation-name">Equipa</span>
+            <div className="relation-main">
+              <span className="relation-value">
+                {player.relations?.team ?? 50}{" "}
+                <span className="relation-label">
+                  ({describeRelation(player.relations?.team ?? 50)})
+                </span>
+              </span>
+              <Bar value={player.relations?.team ?? 50} />
+              <Delta change={lastDelta?.relationsChange?.team ?? 0} />
+            </div>
+          </div>
+
+          <div className="relation-row">
+            <span className="relation-name">Adeptos</span>
+            <div className="relation-main">
+              <span className="relation-value">
+                {player.relations?.fans ?? 50}{" "}
+                <span className="relation-label">
+                  ({describeRelation(player.relations?.fans ?? 50)})
+                </span>
+              </span>
+              <Bar value={player.relations?.fans ?? 50} />
+              <Delta change={lastDelta?.relationsChange?.fans ?? 0} />
+            </div>
+          </div>
+
+          <div className="relation-row">
+            <span className="relation-name">Imprensa</span>
+            <div className="relation-main">
+              <span className="relation-value">
+                {player.relations?.media ?? 50}{" "}
+                <span className="relation-label">
+                  ({describeRelation(player.relations?.media ?? 50)})
+                </span>
+              </span>
+              <Bar value={player.relations?.media ?? 50} />
+              <Delta change={lastDelta?.relationsChange?.media ?? 0} />
+            </div>
+          </div>
+
+          <hr className="sidebar-divider" />
+
+          <h3>Personalidade</h3>
+
+          <AxisRow
+            label="Profissionalismo / Boémio"
+            left="Boémio"
+            right="Profissional"
+            value={player.personality?.profissionalismo ?? 50}
+          />
+          <AxisRow
+            label="Fair-play / Anti-jogo"
+            left="Anti-jogo"
+            right="Fair-play"
+            value={player.personality?.fairplay ?? 50}
+          />
+          <AxisRow
+            label="Lealdade ao clube / Mercenário"
+            left="Mercenário"
+            right="Leal ao clube"
+            value={player.personality?.loyalty ?? 50}
+          />
+          <AxisRow
+            label="Humildade / Ego"
+            left="Ego"
+            right="Humilde"
+            value={player.personality?.humildade ?? 50}
+          />
+          <AxisRow
+            label="Trabalho de equipa / Individualista"
+            left="Individualista"
+            right="Equipa"
+            value={player.personality?.equipa ?? 50}
+          />
+          <AxisRow
+            label="Calma / Temperamento explosivo"
+            left="Explosivo"
+            right="Calmo"
+            value={player.personality?.calma ?? 50}
+          />
+        </>
+      )}
+    </aside>
+  );
+
   return (
     <div className="app">
       <header className="header">
@@ -666,7 +825,8 @@ function App() {
         </div>
       </header>
 
-      {screen === "characterCreation" ? (
+      {/* === SCREEN 1 – CRIAÇÃO DE PERSONAGEM (SEM SIDEBAR) === */}
+      {screen === "characterCreation" && (
         <main className="content creation-content">
           <section className="creation-card">
             <h2>Nova Carreira</h2>
@@ -767,288 +927,153 @@ function App() {
             </form>
           </section>
         </main>
-      ) : screen === "weekHub" ? (
-        <main className="content creation-content">
-          {lastMatchSummary && (
-            <section className="creation-card last-match-card">
-              <h2>Resumo do último jogo</h2>
-              <p className="creation-subtitle">
-                Como foi a tua exibição na última partida.
-              </p>
+      )}
 
-              <div className="last-match-main">
-                <div className="last-match-rating">
-                  <span className="last-match-rating-value">
-                    {lastMatchSummary.rating}
-                  </span>
-                  <span className="last-match-rating-label">Nota</span>
-                </div>
+      {/* === SCREEN 2 – HUB SEMANAL (COM SIDEBAR) === */}
+      {screen === "weekHub" && (
+        <main className="content">
+          {renderSidebar()}
 
-                <div className="last-match-details">
-                  <p>
-                    <strong>Golos:</strong> {lastMatchSummary.goals}
-                  </p>
-                  <p>
-                    <strong>Grandes oportunidades falhadas:</strong>{" "}
-                    {lastMatchSummary.bigChancesMissed}
-                  </p>
-                  <p>
-                    <strong>Passes-chave:</strong>{" "}
-                    {lastMatchSummary.keyPasses}
-                  </p>
-                </div>
-              </div>
-
-              <p className="last-match-comment">
-                {lastMatchSummary.comment}
-              </p>
-            </section>
-          )}
-
-          {currentEvent && (
-            <section className="creation-card social-card">
-              <h2>Evento da semana</h2>
-              <p className="creation-subtitle">
-                Uma situação fora de campo que pode mudar a tua carreira.
-              </p>
-
-              <h3 className="social-title">{currentEvent.title}</h3>
-              <p className="social-text">{currentEvent.text}</p>
-
-              <div className="options">
-                {currentEvent.options.map((opt) => (
-                  <button
-                    key={opt.id}
-                    className="option-button"
-                    onClick={() => handleSocialOptionClick(opt)}
-                    disabled={isRolling}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </section>
-          )}
-
-          <section className="creation-card week-card">
-            <h2>Semana {week} – Treino</h2>
-            <p className="creation-subtitle">
-              Escolhe o foco da semana antes do próximo jogo.
-            </p>
-
-            {player && (
-              <div className="week-status">
-                <p>
-                  <strong>Condição Física:</strong> {player.stamina}
+          <section className="story">
+            {lastMatchSummary && (
+              <div className="creation-card last-match-card">
+                <h2>Resumo do último jogo</h2>
+                <p className="creation-subtitle">
+                  Como foi a tua exibição na última partida.
                 </p>
-                <p>
-                  <strong>Moral:</strong> {player.morale}
+
+                <div className="last-match-main">
+                  <div className="last-match-rating">
+                    <span className="last-match-rating-value">
+                      {lastMatchSummary.rating}
+                    </span>
+                    <span className="last-match-rating-label">Nota</span>
+                  </div>
+
+                  <div className="last-match-details">
+                    <p>
+                      <strong>Golos:</strong> {lastMatchSummary.goals}
+                    </p>
+                    <p>
+                      <strong>Grandes oportunidades falhadas:</strong>{" "}
+                      {lastMatchSummary.bigChancesMissed}
+                    </p>
+                    <p>
+                      <strong>Passes-chave:</strong>{" "}
+                      {lastMatchSummary.keyPasses}
+                    </p>
+                  </div>
+                </div>
+
+                <p className="last-match-comment">
+                  {lastMatchSummary.comment}
                 </p>
               </div>
             )}
 
-            <div className="week-options">
-              <button
-                className="week-option-button"
-                onClick={() => handleTrainingChoice("fisico")}
-                disabled={isRolling}
-              >
-                <h3>Treino físico intenso</h3>
-                <p>
-                  Corridas, trabalho de força e resistência. Ficas mais
-                  preparado para aguentar o jogo, mas chegas um pouco mais
-                  carregado.
+            {currentEvent && (
+              <div className="creation-card social-card">
+                <h2>Evento da semana</h2>
+                <p className="creation-subtitle">
+                  Uma situação fora de campo que pode mudar a tua carreira.
                 </p>
-                <p className="effects-text">
-                  + Resistência, + CF, - um pouco de Moral
-                </p>
-              </button>
 
-              <button
-                className="week-option-button"
-                onClick={() => handleTrainingChoice("tecnico")}
-                disabled={isRolling}
-              >
-                <h3>Treino técnico</h3>
-                <p>
-                  Finalização, passes em espaços curtos, combinações. Menos
-                  carga física, mais foco na bola.
-                </p>
-                <p className="effects-text">
-                  + Remate, + Passe, - um pouco de CF, + Moral
-                </p>
-              </button>
+                <h3 className="social-title">{currentEvent.title}</h3>
+                <p className="social-text">{currentEvent.text}</p>
 
-              <button
-                className="week-option-button"
-                onClick={() => handleTrainingChoice("descanso")}
-                disabled={isRolling}
-              >
-                <h3>Recuperação e descanso</h3>
-                <p>
-                  Sessões leves, massagem, gelo e foco em dormir bem. Chegas
-                  mais fresco, mas não evoluis tanto.
-                </p>
-                <p className="effects-text">
-                  ++ CF, + Moral, sem aumento directo de atributos
-                </p>
-              </button>
+                <div className="options">
+                  {currentEvent.options.map((opt) => (
+                    <button
+                      key={opt.id}
+                      className="option-button"
+                      onClick={() => handleSocialOptionClick(opt)}
+                      disabled={isRolling}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="creation-card week-card">
+              <h2>Semana {week} – Treino</h2>
+              <p className="creation-subtitle">
+                Escolhe o foco da semana antes do próximo jogo.
+              </p>
+
+              {player && (
+                <div className="week-status">
+                  <p>
+                    <strong>Condição Física:</strong> {player.stamina}
+                  </p>
+                  <p>
+                    <strong>Moral:</strong> {player.morale}
+                  </p>
+                </div>
+              )}
+
+              <div className="week-options">
+                <button
+                  className="week-option-button"
+                  onClick={() => handleTrainingChoice("fisico")}
+                  disabled={isRolling}
+                >
+                  <h3>Treino físico intenso</h3>
+                  <p>
+                    Corridas, trabalho de força e resistência. Ficas mais
+                    preparado para aguentar o jogo, mas chegas um pouco mais
+                    carregado.
+                  </p>
+                  <p className="effects-text">
+                    + Resistência, + CF, - um pouco de Moral
+                  </p>
+                </button>
+
+                <button
+                  className="week-option-button"
+                  onClick={() => handleTrainingChoice("tecnico")}
+                  disabled={isRolling}
+                >
+                  <h3>Treino técnico</h3>
+                  <p>
+                    Finalização, passes em espaços curtos, combinações. Menos
+                    carga física, mais foco na bola.
+                  </p>
+                  <p className="effects-text">
+                    + Remate, + Passe, - um pouco de CF, + Moral
+                  </p>
+                </button>
+
+                <button
+                  className="week-option-button"
+                  onClick={() => handleTrainingChoice("descanso")}
+                  disabled={isRolling}
+                >
+                  <h3>Recuperação e descanso</h3>
+                  <p>
+                    Sessões leves, massagem, gelo e foco em dormir bem. Chegas
+                    mais fresco, mas não evoluis tanto.
+                  </p>
+                  <p className="effects-text">
+                    ++ CF, + Moral, sem aumento directo de atributos
+                  </p>
+                </button>
+              </div>
             </div>
           </section>
         </main>
-      ) : (
+      )}
+
+      {/* === SCREEN 3 – JOGO (COM SIDEBAR) === */}
+      {screen === "game" && (
         <main className="content">
-          <aside className="sidebar">
-            <h2>Ficha do Jogador</h2>
-            {player && (
-              <>
-                <p>
-                  <strong>Nome:</strong>{" "}
-                  {player.name}
-                  {player.nickname ? ` "${player.nickname}"` : ""}
-                </p>
-                <p>
-                  <strong>Posição:</strong> {player.position}
-                </p>
-                <p>
-                  <strong>Clube:</strong> {player.club}
-                </p>
-                <p>
-                  <strong>Backstory:</strong>{" "}
-                  {
-                    BACKSTORIES.find((b) => b.id === player.backstory)?.title ??
-                    "N/A"
-                  }
-                </p>
-
-                <hr className="sidebar-divider" />
-
-                <AttributeRadar attributes={player.attributes} />
-
-                <p className="attr-inline">
-                  <span>Remate: <strong>{player.attributes.remate}</strong></span>
-                  <span>Passe: <strong>{player.attributes.passe}</strong></span>
-                </p>
-                <p className="attr-inline">
-                  <span>Drible: <strong>{player.attributes.drible}</strong></span>
-                  <span>Velocidade: <strong>{player.attributes.velocidade}</strong></span>
-                </p>
-                <p className="attr-inline">
-                  <span>Resistência: <strong>{player.attributes.resistencia}</strong></span>
-                  <span>Compostura: <strong>{player.attributes.compostura}</strong></span>
-                </p>
-
-                <hr className="sidebar-divider" />
-
-                <h3>Relações</h3>
-
-                <div className="relation-row">
-                  <span className="relation-name">Treinador</span>
-                  <div className="relation-main">
-                    <span className="relation-value">
-                      {player.relations?.coach ?? 50}{" "}
-                      <span className="relation-label">
-                        ({describeRelation(player.relations?.coach ?? 50)})
-                      </span>
-                    </span>
-                    <Bar value={player.relations?.coach ?? 50} />
-                    <Delta
-                      change={lastDelta?.relationsChange?.coach ?? 0}
-                    />
-                  </div>
-                </div>
-
-                <div className="relation-row">
-                  <span className="relation-name">Equipa</span>
-                  <div className="relation-main">
-                    <span className="relation-value">
-                      {player.relations?.team ?? 50}{" "}
-                      <span className="relation-label">
-                        ({describeRelation(player.relations?.team ?? 50)})
-                      </span>
-                    </span>
-                    <Bar value={player.relations?.team ?? 50} />
-                    <Delta change={lastDelta?.relationsChange?.team ?? 0} />
-                  </div>
-                </div>
-
-                <div className="relation-row">
-                  <span className="relation-name">Adeptos</span>
-                  <div className="relation-main">
-                    <span className="relation-value">
-                      {player.relations?.fans ?? 50}{" "}
-                      <span className="relation-label">
-                        ({describeRelation(player.relations?.fans ?? 50)})
-                      </span>
-                    </span>
-                    <Bar value={player.relations?.fans ?? 50} />
-                    <Delta change={lastDelta?.relationsChange?.fans ?? 0} />
-                  </div>
-                </div>
-
-                <div className="relation-row">
-                  <span className="relation-name">Imprensa</span>
-                  <div className="relation-main">
-                    <span className="relation-value">
-                      {player.relations?.media ?? 50}{" "}
-                      <span className="relation-label">
-                        ({describeRelation(player.relations?.media ?? 50)})
-                      </span>
-                    </span>
-                    <Bar value={player.relations?.media ?? 50} />
-                    <Delta change={lastDelta?.relationsChange?.media ?? 0} />
-                  </div>
-                </div>
-
-                <hr className="sidebar-divider" />
-
-                <h3>Personalidade</h3>
-
-                <AxisRow
-                  label="Profissionalismo / Boémio"
-                  left="Boémio"
-                  right="Profissional"
-                  value={player.personality?.profissionalismo ?? 50}
-                />
-                <AxisRow
-                  label="Fair-play / Anti-jogo"
-                  left="Anti-jogo"
-                  right="Fair-play"
-                  value={player.personality?.fairplay ?? 50}
-                />
-                <AxisRow
-                  label="Lealdade ao clube / Mercenário"
-                  left="Mercenário"
-                  right="Leal ao clube"
-                  value={player.personality?.loyalty ?? 50}
-                />
-                <AxisRow
-                  label="Humildade / Ego"
-                  left="Ego"
-                  right="Humilde"
-                  value={player.personality?.humildade ?? 50}
-                />
-                <AxisRow
-                  label="Trabalho de equipa / Individualista"
-                  left="Individualista"
-                  right="Equipa"
-                  value={player.personality?.equipa ?? 50}
-                />
-                <AxisRow
-                  label="Calma / Temperamento explosivo"
-                  left="Explosivo"
-                  right="Calmo"
-                  value={player.personality?.calma ?? 50}
-                />
-              </>
-            )}
-          </aside>
+          {renderSidebar()}
 
           <section className="story">
             <h2>{scene.title}</h2>
             <p className="story-text">{scene.text}</p>
 
-            {/* UI do roll */}
             {isRolling && (
               <div className="roll-overlay">
                 <div className="roll-box">
@@ -1085,7 +1110,6 @@ function App() {
               </div>
             )}
 
-            {/* Caixa de texto para decisões livres – só nas cenas com intents */}
             {scene.intents && (
               <div className="free-action">
                 <label htmlFor="free-action-input">
@@ -1118,7 +1142,6 @@ function App() {
               </div>
             )}
 
-            {/* Sugestões rápidas */}
             {scene.options && scene.options.length > 0 && (
               <>
                 <h3 className="options-title">Sugestões rápidas</h3>

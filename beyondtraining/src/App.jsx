@@ -174,7 +174,7 @@ function App() {
     keyPasses: 0
   });
   const [lastMatchSummary, setLastMatchSummary] = useState(null);
-
+  const [matchHistory, setMatchHistory] = useState([]); 
   const [currentEvent, setCurrentEvent] = useState(null);
   const [eventWeek, setEventWeek] = useState(null);
 
@@ -212,6 +212,7 @@ function App() {
         }
       );
       setLastMatchSummary(data.lastMatchSummary || null);
+      setMatchHistory(data.matchHistory || []);
       setCurrentEvent(data.currentEvent || null);
       setEventWeek(data.eventWeek ?? null);
       setLastTestResult(null);
@@ -241,7 +242,8 @@ function App() {
       matchStats,
       lastMatchSummary,
       currentEvent,
-      eventWeek
+      eventWeek,
+      matchHistory
     };
 
     try {
@@ -407,14 +409,20 @@ function App() {
 
     if (option.goToWeekHub) {
       const resumo = criarResumoJogo(newMatchStats);
+      const entry = {
+        week,
+        ...resumo
+      };
+
       setLastMatchSummary(resumo);
+      setMatchHistory(prev => [...prev, entry]);
 
       setFreeActionText("");
       setFreeActionFeedback("");
       setCurrentSceneId("inicio");
       setScreen("weekHub");
       setWeek((prev) => prev + 1);
-    } else {
+    }else {
       setCurrentSceneId(nextId);
     }
   }
@@ -1012,7 +1020,7 @@ function App() {
                   </p>
                 </div>
               )}
-
+            
               <div className="week-options">
                 <button
                   className="week-option-button"
@@ -1061,6 +1069,32 @@ function App() {
                 </button>
               </div>
             </div>
+            {matchHistory.length > 0 && (
+          <section className="creation-card history-card">
+            <h2>Histórico de jogos</h2>
+            <p className="creation-subtitle">
+              Acompanhar a tua evolução ao longo das semanas.
+            </p>
+
+            <div className="history-list">
+              {matchHistory.map((m) => (
+                <div key={m.week} className="history-row">
+                  <div className="history-main">
+                    <span className="history-week">Semana {m.week}</span>
+                    <span className="history-rating">{m.rating}</span>
+                  </div>
+                  <div className="history-extra">
+                    <span>Golos: {m.goals}</span>
+                    <span>GC falhadas: {m.bigChancesMissed}</span>
+                    <span>Passes-chave: {m.keyPasses}</span>
+                  </div>
+                  <p className="history-comment">{m.comment}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
           </section>
           {currentEvent && (
             <EventPopup

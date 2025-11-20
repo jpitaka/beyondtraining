@@ -1022,3 +1022,50 @@ body {
 .popup-option-button:hover {
   background: #1b3358;
 }
+
+.history-card {
+  margin-top: 1rem;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.history-row {
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid #1f2937;
+  background: rgba(15, 23, 42, 0.9);
+  font-size: 0.8rem;
+}
+
+.history-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.history-week {
+  font-weight: 600;
+  color: #bfdbfe;
+}
+
+.history-rating {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.history-extra {
+  display: flex;
+  gap: 1rem;
+  color: #9ca3af;
+  margin-bottom: 0.2rem;
+}
+
+.history-comment {
+  margin: 0;
+  color: #e5e7eb;
+}

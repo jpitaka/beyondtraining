@@ -1,13 +1,14 @@
 /* ==== BASE / RESET PARA DESKTOP ==== */
 
 html,
-body,
-#root {
-  height: 100%;
+body {
+  min-height: 100%;
   width: 100%;
 }
 
 #root {
+  width: 100%;
+  min-height: 100vh;
   max-width: none;
   margin: 0;
   padding: 0;
@@ -17,16 +18,15 @@ body,
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
 
-  /* Paleta “noite de jogo” */
-  --bg-main: #020617;
-  --bg-gradient-top: #0b1120;         /* azul escuro */
-  --bg-gradient-mid: #0369a1;         /* azul “projector” */
+  /* Fundo tipo estádio à noite, mas não tão preto */
+  --bg-main: #030712;
+  --bg-gradient-top: #0b1f3b;
   --bg-gradient-bottom: #020617;
 
   /* Superfícies */
-  --card-bg: #050c1f;
-  --card-bg-soft: #071325;
-  --card-border: #1f2937;
+  --card-bg: rgba(15, 23, 42, 0.96);
+  --card-bg-soft: rgba(15, 23, 42, 0.9);
+  --card-border: rgba(148, 163, 184, 0.25);
 
   /* Texto */
   --text-main: #e5e7eb;
@@ -35,26 +35,20 @@ body,
   --text-title: #f9fafb;
 
   /* Cores “futebol” */
-  --accent-main: #2563eb;             /* azul */
+  --accent-main: #2563eb;       /* azul */
   --accent-main-soft: #1d4ed8;
-  --accent-secondary: #22c55e;        /* verde relvado */
+  --accent-secondary: #22c55e;  /* verde “relvado” */
   --accent-secondary-soft: #16a34a;
 
   /* Estados */
   --danger: #ef4444;
   --success: #22c55e;
-
-  /* Linhas de relvado subtis */
-  --pitch-line: rgba(34, 197, 94, 0.16);
 }
 
 body {
   margin: 0;
+  background: radial-gradient(circle at top, var(--bg-gradient-top), var(--bg-gradient-bottom));
   color: var(--text-main);
-  background:
-    radial-gradient(circle at top, rgba(56, 189, 248, 0.25), transparent 55%),
-    radial-gradient(circle at bottom, rgba(34, 197, 94, 0.18), transparent 55%),
-    linear-gradient(to bottom, var(--bg-gradient-top), var(--bg-gradient-bottom));
 }
 
 /* ==== LAYOUT GERAL ==== */
@@ -64,45 +58,15 @@ body {
   display: flex;
   flex-direction: column;
   color: var(--text-main);
-  position: relative;
-  overflow: hidden;
-}
-
-/* padrão muito leve tipo relvado */
-
-.app::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(
-      to right,
-      transparent 0,
-      transparent 60px,
-      var(--pitch-line) 60px,
-      transparent 61px
-    ),
-    linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent 60px,
-      var(--pitch-line) 60px,
-      transparent 61px
-    );
-  opacity: 0.12;
-  mix-blend-mode: screen;
-  z-index: -1;
+  background: radial-gradient(circle at top, var(--bg-gradient-top), var(--bg-gradient-bottom));
 }
 
 /* ==== HEADER ==== */
 
 .header {
   padding: 1rem 2.5rem;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.8);
-  background:
-    radial-gradient(circle at top left, rgba(56, 189, 248, 0.35), transparent 55%),
-    linear-gradient(90deg, #1d4ed8 0%, #0ea5e9 40%, #22c55e 80%, #020617 100%);
+  border-bottom: 1px solid #0b1120;
+  background: linear-gradient(90deg, #1d4ed8 0%, #0ea5e9 40%, #22c55e 80%, #020617 100%);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -114,29 +78,41 @@ body {
   font-size: 1.5rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--text-title);
+  color: #f9fafb;
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
-/* ==== STATUS NO HEADER ==== */
+/* ==== STATUS NO HEADER (liquid glass) ==== */
 
 .status-bar {
   display: flex;
-  gap: 1.5rem;
-  align-items: flex-end;
+  gap: 1.4rem;
+  align-items: center;
   font-size: 0.9rem;
+  padding: 0.6rem 1.4rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.75),
+    rgba(37, 99, 235, 0.35)
+  );
+  box-shadow:
+    0 0 0 1px rgba(15, 23, 42, 0.7),
+    0 18px 45px rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .status-item {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  min-width: 150px;
+  min-width: 140px;
 }
 
 .status-label {
@@ -159,7 +135,7 @@ body {
 
 .status-xp-detail {
   font-size: 0.75rem;
-  color: var(--text-muted);
+  color: #cbd5f5;
   margin-top: 0.1rem;
 }
 
@@ -173,7 +149,7 @@ body {
 
 .bar-fill {
   height: 100%;
-  background: linear-gradient(to right, var(--accent-secondary), var(--accent-main));
+  background: linear-gradient(to right, #22c55e, #2563eb);
 }
 
 .delta {
@@ -181,11 +157,11 @@ body {
 }
 
 .delta--pos {
-  color: var(--success);
+  color: #22c55e;
 }
 
 .delta--neg {
-  color: var(--danger);
+  color: #ef4444;
 }
 
 .reset-button {
@@ -199,14 +175,12 @@ body {
   letter-spacing: 0.12em;
   cursor: pointer;
   opacity: 0.95;
-  transition: background 0.15s ease, border 0.15s ease, transform 0.05s ease,
-    box-shadow 0.15s ease;
+  transition: background 0.15s ease, border 0.15s ease, transform 0.05s ease;
 }
 
 .reset-button:hover {
   border-color: var(--danger);
-  background: rgba(30, 64, 175, 0.96);
-  box-shadow: 0 0 0 1px rgba(248, 250, 252, 0.08);
+  background: rgba(30, 64, 175, 0.95);
 }
 
 .reset-button:active {
@@ -218,7 +192,7 @@ body {
 .content {
   flex: 1;
   display: flex;
-  align-items: stretch;
+  align-items: flex-start;
   gap: 32px;
   padding: 24px 48px 40px;
   width: 100%;
@@ -236,18 +210,23 @@ body {
 
 .creation-card {
   width: 100%;
-  height: calc(100vh - 120px); /* altura quase cheia, consistente */
+  min-height: calc(100vh - 120px); /* pelo menos o ecrã, cresce se precisar */
   margin: 0;
   padding: 24px 28px;
-  border-radius: 18px;
-  background:
-    radial-gradient(circle at top left, rgba(56, 189, 248, 0.25), transparent 65%),
-    radial-gradient(circle at bottom right, rgba(34, 197, 94, 0.22), transparent 65%),
-    linear-gradient(to bottom right, var(--card-bg-soft), var(--card-bg));
+  border-radius: 24px;
+  background: linear-gradient(
+    135deg,
+    rgba(37, 99, 235, 0.18),
+    rgba(15, 23, 42, 0.96)
+  );
   border: 1px solid var(--card-border);
+  box-shadow:
+    0 24px 80px rgba(15, 23, 42, 0.95),
+    0 0 0 1px rgba(15, 23, 42, 0.7);
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
 }
 
 .creation-card h2 {
@@ -255,7 +234,7 @@ body {
   font-size: 1.3rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #dbeafe;
+  color: #bfdbfe;
 }
 
 .week-card h2 {
@@ -265,7 +244,7 @@ body {
 .creation-subtitle {
   margin: 0 0 1.5rem;
   font-size: 0.95rem;
-  color: var(--text-muted);
+  color: #9ca3af;
 }
 
 /* bloco de estado semana (CF / Moral) */
@@ -292,7 +271,7 @@ body {
   padding: 0.9rem 1rem;
   border-radius: 14px;
   border: 1px solid #1f2937;
-  background: rgba(15, 23, 42, 0.95);
+  background: rgba(15, 23, 42, 0.96);
   color: #e5e7eb;
   cursor: pointer;
   transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s ease,
@@ -308,7 +287,7 @@ body {
 .week-option-button p {
   margin: 0.15rem 0;
   font-size: 0.84rem;
-  color: var(--text-muted);
+  color: #9ca3af;
 }
 
 .week-option-button .effects-text {
@@ -317,8 +296,10 @@ body {
 }
 
 .week-option-button:hover {
-  border-color: var(--accent-main);
-  box-shadow: 0 0 0 1px var(--accent-main);
+  border-color: #2563eb;
+  box-shadow:
+    0 0 0 1px #2563eb,
+    0 10px 30px rgba(15, 23, 42, 0.9);
   background: #020617;
   transform: translateY(-1px);
 }
@@ -348,21 +329,17 @@ body {
 .field-group select {
   border-radius: 999px;
   border: 1px solid #374151;
-  background: rgba(15, 23, 42, 0.9);
+  background: #020617;
   color: #e5e7eb;
   padding: 0.6rem 0.9rem;
   font-size: 0.9rem;
   outline: none;
 }
 
-.field-group input::placeholder {
-  color: #6b7280;
-}
-
 .field-group input:focus,
 .field-group select:focus {
-  border-color: var(--accent-main);
-  box-shadow: 0 0 0 1px var(--accent-main);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px #2563eb;
 }
 
 /* backstories */
@@ -376,7 +353,7 @@ body {
 .help-text {
   margin: 0 0 0.8rem;
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: #9ca3af;
 }
 
 .backstory-grid {
@@ -388,7 +365,7 @@ body {
 .backstory-card {
   border-radius: 14px;
   border: 1px solid #1f2937;
-  background: rgba(15, 23, 42, 0.9);
+  background: rgba(15, 23, 42, 0.96);
   padding: 0.8rem 0.85rem;
   display: flex;
   align-items: flex-start;
@@ -403,8 +380,10 @@ body {
 }
 
 .backstory-card--active {
-  border-color: var(--accent-main);
-  box-shadow: 0 0 0 1px var(--accent-main);
+  border-color: #2563eb;
+  box-shadow:
+    0 0 0 1px #2563eb,
+    0 10px 30px rgba(15, 23, 42, 0.9);
   background: #020617;
   transform: translateY(-1px);
 }
@@ -418,7 +397,7 @@ body {
 .backstory-content p {
   margin: 0.1rem 0;
   font-size: 0.82rem;
-  color: var(--text-muted);
+  color: #9ca3af;
 }
 
 .backstory-content .effects-text {
@@ -438,7 +417,7 @@ body {
   padding: 0.8rem 1.4rem;
   border-radius: 999px;
   border: none;
-  background: var(--accent-main);
+  background: #2563eb;
   color: #e5e7eb;
   font-weight: 600;
   font-size: 0.95rem;
@@ -450,9 +429,8 @@ body {
 }
 
 .primary-button:hover {
-  background: var(--accent-main-soft);
-  box-shadow: 0 0 0 1px var(--accent-main-soft);
-  transform: translateY(-1px);
+  background: #1d4ed8;
+  box-shadow: 0 0 0 1px #1d4ed8;
 }
 
 .primary-button:active {
@@ -471,7 +449,7 @@ body {
   font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #bfdbfe;
+  color: #93c5fd;
 }
 
 .sidebar p {
@@ -484,23 +462,28 @@ body {
 .story {
   flex: 1;
   min-width: 0;
-  height: calc(100vh - 120px); /* altura consistente em desktop */
+  min-height: calc(100vh - 120px); /* pelo menos a área de jogo */
   padding: 24px 28px;
-  border-radius: 18px;
-  background:
-    radial-gradient(circle at top left, rgba(56, 189, 248, 0.25), transparent 60%),
-    radial-gradient(circle at bottom right, rgba(34, 197, 94, 0.2), transparent 60%),
-    linear-gradient(to bottom right, #020617, #020617);
+  border-radius: 24px;
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.18),
+    rgba(15, 23, 42, 0.96)
+  );
   border: 1px solid var(--card-border);
+  box-shadow:
+    0 24px 80px rgba(15, 23, 42, 0.95),
+    0 0 0 1px rgba(15, 23, 42, 0.7);
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
 }
 
 .story h2 {
   margin: 0;
   font-size: 1.2rem;
-  color: #dbeafe;
+  color: #bfdbfe;
 }
 
 .story-text {
@@ -517,7 +500,7 @@ body {
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--text-muted);
+  color: #9ca3af;
 }
 
 .options {
@@ -536,13 +519,12 @@ body {
   font-size: 0.95rem;
   text-align: left;
   transition: background 0.15s ease, transform 0.05s ease,
-    box-shadow 0.15s ease, border 0.15s ease;
+    box-shadow 0.15s ease;
 }
 
 .option-button:hover {
   background: #1d4ed8;
   box-shadow: 0 0 0 1px #1d4ed8;
-  transform: translateY(-1px);
 }
 
 .option-button:active {
@@ -563,7 +545,7 @@ body {
   padding: 0.65rem 0.9rem;
   border-radius: 10px;
   border: 1px solid #374151;
-  background: rgba(15, 23, 42, 0.95);
+  background: #020617;
   font-size: 0.85rem;
 }
 
@@ -673,7 +655,7 @@ body {
 
 .relation-label {
   font-size: 0.8rem;
-  color: var(--text-muted);
+  color: #9ca3af;
 }
 
 .relation-row {
@@ -702,7 +684,7 @@ body {
   padding: 0.75rem 0.9rem;
   border-radius: 12px;
   border: 1px solid #111827;
-  background: rgba(15, 23, 42, 0.95);
+  background: #020617;
 }
 
 .free-action label {
@@ -727,29 +709,25 @@ body {
 
 .free-action textarea:focus {
   outline: none;
-  border-color: var(--accent-main);
-  box-shadow: 0 0 0 1px var(--accent-main);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px #2563eb;
 }
 
 .free-action-button {
   margin-top: 0.5rem;
   padding: 0.35rem 0.9rem;
   border-radius: 999px;
-  border: 1px solid var(--accent-main);
-  background: var(--accent-main-soft);
+  border: 1px solid #2563eb;
+  background: #1d4ed8;
   color: #e5e7eb;
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.05s ease,
-    box-shadow 0.15s ease;
 }
 
 .free-action-button:hover {
   background: #1e40af;
-  box-shadow: 0 0 0 1px var(--accent-main);
-  transform: translateY(-1px);
 }
 
 .free-action-feedback {
@@ -761,7 +739,7 @@ body {
 .free-action-hint {
   margin-top: 0.25rem;
   font-size: 0.75rem;
-  color: var(--text-muted);
+  color: #9ca3af;
 }
 
 /* ==== PERSONALIDADE (SLIDERS) ==== */
@@ -775,7 +753,7 @@ body {
   justify-content: space-between;
   align-items: center;
   font-size: 0.75rem;
-  color: var(--text-muted);
+  color: #9ca3af;
   margin-bottom: 0.2rem;
 }
 
@@ -863,7 +841,7 @@ body {
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--text-muted);
+  color: #9ca3af;
   margin-bottom: 0.4rem;
 }
 
@@ -913,7 +891,7 @@ body {
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--text-muted);
+  color: #9ca3af;
 }
 
 .last-match-details {
@@ -955,7 +933,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(3, 7, 18, 0.75);
+  background: rgba(0, 0, 0, 0.65);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -965,30 +943,22 @@ body {
 .popup-box {
   width: 500px;
   max-width: 90%;
-  background: #020617;
-  border-radius: 16px;
-  padding: 28px 30px 26px;
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.7);
-  border: 1px solid #1f2937;
+  background: #0f1624;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
   animation: popIn 0.25s ease-out;
 }
 
 @keyframes popIn {
-  from {
-    transform: scale(0.92);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 .popup-title {
-  margin-top: 6px;
-  font-size: 1.2rem;
-  margin-bottom: 8px;
-  color: #dbeafe;
+  margin-top: 8px;
+  font-size: 22px;
+  margin-bottom: 10px;
 }
 
 .popup-options {
@@ -999,19 +969,13 @@ body {
 }
 
 .popup-option-button {
-  background: #0b1120;
+  background: #112244;
   padding: 10px 14px;
-  border-radius: 10px;
-  border: 1px solid #1e293b;
-  color: #e5e7eb;
-  font-size: 0.9rem;
-  text-align: left;
-  cursor: pointer;
+  border-radius: 8px;
+  border: 1px solid #223355;
   transition: 0.15s ease;
 }
 
 .popup-option-button:hover {
-  background: #111827;
-  border-color: var(--accent-main);
-  box-shadow: 0 0 0 1px var(--accent-main);
+  background: #1b3358;
 }

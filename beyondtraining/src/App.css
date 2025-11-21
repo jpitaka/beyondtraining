@@ -29,10 +29,10 @@ body {
   --card-border: rgba(148, 163, 184, 0.25);
 
   /* Texto */
-  --text-main: #e5e7eb;
-  --text-muted: #9ca3af;
-  --text-soft: #6b7280;
-  --text-title: #f9fafb;
+  --text-main: #f3f4f6;        /* mais brilhante */
+  --text-muted: #d1d5db;       /* muito mais legível */
+  --text-soft: #9ca3af;        /* melhor contraste */
+  --text-title: #ffffff;
 
   /* Cores “futebol” */
   --accent-main: #2563eb;       /* azul */
@@ -43,6 +43,15 @@ body {
   /* Estados */
   --danger: #ef4444;
   --success: #22c55e;
+
+    /* ==== SISTEMA DE ESPAÇAMENTO ==== */
+  --space-xs: 0.25rem;    /* 4px */
+  --space-sm: 0.5rem;     /* 8px */
+  --space-md: 0.75rem;    /* 12px */
+  --space-lg: 1rem;       /* 16px */
+  --space-xl: 1.5rem;     /* 24px */
+  --space-2xl: 2rem;      /* 32px */
+  --space-3xl: 3rem;      /* 48px */
 }
 
 body {
@@ -64,21 +73,25 @@ body {
 /* ==== HEADER ==== */
 
 .header {
-  padding: 1rem 2.5rem;
-  border-bottom: 1px solid #0b1120;
-  background: linear-gradient(90deg, #1d4ed8 0%, #0ea5e9 40%, #22c55e 80%, #020617 100%);
+  padding: 1.25rem 2.5rem;
+  border-bottom: 2px solid rgba(37, 99, 235, 0.3);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(3, 7, 18, 0.98) 100%);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.6);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .header h1 {
   margin: 0;
-  font-size: 1.5rem;
-  letter-spacing: 0.18em;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #f9fafb;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .header-right {
@@ -111,14 +124,15 @@ body {
 .status-item {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: var(--space-xs);
   min-width: 140px;
 }
 
 .status-label {
-  font-size: 0.7rem;
+  font-size: 0.8rem;  /* ✅ */
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.12em;
   color: var(--text-soft);
 }
 
@@ -134,8 +148,9 @@ body {
 }
 
 .status-xp-detail {
-  font-size: 0.75rem;
-  color: #cbd5f5;
+  font-size: 0.85rem;  /* ✅ maior */
+  font-weight: 500;
+  color: #e0e7ff;      /* ✅ mais brilhante */
   margin-top: 0.1rem;
 }
 
@@ -193,8 +208,8 @@ body {
   flex: 1;
   display: flex;
   align-items: flex-start;
-  gap: 32px;
-  padding: 24px 48px 40px;
+  gap: var(--space-2xl);
+  padding: var(--space-xl) var(--space-3xl) 40px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -212,19 +227,18 @@ body {
   width: 100%;
   height: calc(100vh - 120px);
   margin: 0;
-  padding: 24px 32px;
-  border-radius: 28px;
+  padding: 28px 36px;
+  border-radius: 20px;
 
   background:
-    radial-gradient(circle at top left, rgba(59, 130, 246, 0.32), transparent 55%),
-    radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.24), transparent 55%),
-    rgba(15, 23, 42, 0.84);
-  border: 1px solid rgba(148, 163, 184, 0.45);
+    radial-gradient(circle at top, rgba(37, 99, 235, 0.15), transparent 65%),
+    rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(37, 99, 235, 0.3);
   box-shadow:
-    0 22px 55px rgba(15, 23, 42, 0.92),
-    0 0 0 1px rgba(15, 23, 42, 0.96);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(148, 163, 184, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 
   display: flex;
   flex-direction: column;
@@ -262,26 +276,27 @@ body {
 .week-options {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
-  margin-top: 0.5rem;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
 }
 
 .week-option-button {
   width: 100%;
   text-align: left;
-  padding: 0.9rem 1rem;
-  border-radius: 18px;
-  border: 1px solid rgba(148, 163, 184, 0.55);
-  background:
-    linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.78));
-  color: #e5e7eb;
+  padding: 1rem 1.25rem;
+  border-radius: 16px;
+  border: 1px solid rgba(37, 99, 235, 0.4);
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text-main);
   cursor: pointer;
-  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.75);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(148, 163, 184, 0.08);
   transition:
-    border 0.15s ease,
-    box-shadow 0.15s ease,
-    background 0.15s ease,
-    transform 0.06s ease;
+    border 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    transform 0.1s ease;
 }
 
 .week-option-button h3 {
@@ -302,10 +317,13 @@ body {
 }
 
 .week-option-button:hover {
-  border-color: rgba(191, 219, 254, 0.9);
-  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.9);
-  background:
-    linear-gradient(135deg, rgba(37, 99, 235, 0.32), rgba(15, 23, 42, 0.95));
+  border-color: rgba(37, 99, 235, 0.7);
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(37, 99, 235, 0.5),
+    inset 0 1px 0 rgba(148, 163, 184, 0.12);
+  background: rgba(37, 99, 235, 0.15);
+  transform: translateY(-1px);
 }
 
 .week-option-button:active {
@@ -317,19 +335,19 @@ body {
 .creation-form {
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
+  gap: var(--space-xl);
 }
 
 .field-group {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem 1.5rem;
+  gap: var(--space-lg) var(--space-xl);
 }
 
 .field-group label {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: var(--space-sm);
   font-size: 0.9rem;
 }
 
@@ -367,17 +385,17 @@ body {
 .backstory-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 0.8rem;
+  gap: var(--space-md);
 }
 
 .backstory-card {
   border-radius: 14px;
   border: 1px solid #1f2937;
   background: rgba(15, 23, 42, 0.96);
-  padding: 0.8rem 0.85rem;
+  padding: var(--space-md) var(--space-lg);
   display: flex;
   align-items: flex-start;
-  gap: 0.6rem;
+  gap: var(--space-md);
   cursor: pointer;
   transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s ease,
     transform 0.05s ease;
@@ -422,61 +440,77 @@ body {
 /* botão principal */
 
 .primary-button {
-  padding: 0.8rem 1.4rem;
+  padding: 0.9rem 2rem;
   border-radius: 999px;
-  border: none;
-  background: #2563eb;
-  color: #e5e7eb;
-  font-weight: 600;
-  font-size: 0.95rem;
+  border: 2px solid rgba(37, 99, 235, 0.8);
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
   cursor: pointer;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  transition: background 0.15s ease, transform 0.05s ease,
-    box-shadow 0.15s ease;
+  box-shadow:
+    0 4px 16px rgba(37, 99, 235, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: 
+    background 0.2s ease, 
+    transform 0.15s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .primary-button:hover {
-  background: #1d4ed8;
-  box-shadow: 0 0 0 1px #1d4ed8;
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  border-color: rgba(59, 130, 246, 1);
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 24px rgba(37, 99, 235, 0.6),
+    0 0 0 2px rgba(147, 197, 253, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .primary-button:active {
-  transform: translateY(1px);
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    0 2px 8px rgba(37, 99, 235, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 /* ==== SIDEBAR + HISTÓRIA (ECRÃ DE JOGO) ==== */
 
 .sidebar {
-  width: 280px;
+  width: 290px;
   flex-shrink: 0;
-  padding: 20px 20px 22px;
+  padding: var(--space-xl) var(--space-xl) var(--space-2xl);
   box-sizing: border-box;
 
-  border-radius: 24px;
+  border-radius: 20px;
   background:
-    radial-gradient(circle at top left, rgba(59, 130, 246, 0.22), transparent 55%),
-    radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.18), transparent 55%),
-    rgba(15, 23, 42, 0.86);
-  border: 1px solid rgba(148, 163, 184, 0.45);
+    radial-gradient(circle at top, rgba(37, 99, 235, 0.12), transparent 70%),
+    rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(37, 99, 235, 0.25);
   box-shadow:
-    0 22px 55px rgba(15, 23, 42, 0.9),
-    0 0 0 1px rgba(15, 23, 42, 0.95);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(148, 163, 184, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .sidebar h2 {
   margin-top: 0;
-  font-size: 1rem;
+  margin-bottom: var(--space-md);
+  font-size: 0.9rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   color: #93c5fd;
 }
 
 .sidebar p {
-  margin: 0.25rem 0;
+  margin: var(--space-sm) 0;
   font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 /* cartão da história */
@@ -485,19 +519,18 @@ body {
   flex: 1;
   min-width: 0;
   height: calc(100vh - 120px);
-  padding: 24px 32px;
-  border-radius: 28px;
+  padding: 28px 36px;
+  border-radius: 20px;
 
   background:
-    radial-gradient(circle at top left, rgba(59, 130, 246, 0.32), transparent 55%),
-    radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.24), transparent 55%),
-    rgba(15, 23, 42, 0.86);
-  border: 1px solid rgba(148, 163, 184, 0.45);
+    radial-gradient(circle at top, rgba(37, 99, 235, 0.15), transparent 65%),
+    rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(37, 99, 235, 0.3);
   box-shadow:
-    0 22px 55px rgba(15, 23, 42, 0.92),
-    0 0 0 1px rgba(15, 23, 42, 0.96);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(148, 163, 184, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 
   display: flex;
   flex-direction: column;
@@ -529,45 +562,48 @@ body {
 .options {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-md);
 }
 
 .option-button {
-  padding: 0.9rem 1.2rem;
+  padding: 1rem 1.5rem;
   border-radius: 999px;
-  border: 1px solid rgba(191, 219, 254, 0.7);
-  background:
-    linear-gradient(135deg,
-      rgba(37, 99, 235, 0.92),
-      rgba(56, 189, 248, 0.82));
-  color: #f9fafb;
+  border: 2px solid rgba(37, 99, 235, 0.6);
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: #ffffff;
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: 1rem;
+  font-weight: 600;
   text-align: left;
   box-shadow:
-    0 14px 30px rgba(15, 23, 42, 0.9),
-    0 0 0 1px rgba(15, 23, 42, 0.96);
+    0 4px 16px rgba(37, 99, 235, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
   transition:
-    transform 0.08s ease,
+    transform 0.15s ease,
     box-shadow 0.15s ease,
-    filter 0.15s ease;
+    border-color 0.15s ease;
 }
 
 .option-button:hover {
-  filter: brightness(1.05);
+  transform: translateY(-2px);
+  border-color: rgba(59, 130, 246, 0.9);
   box-shadow:
-    0 18px 36px rgba(15, 23, 42, 0.95),
-    0 0 0 1px rgba(191, 219, 254, 0.9);
+    0 8px 24px rgba(37, 99, 235, 0.6),
+    0 0 0 2px rgba(147, 197, 253, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .option-button:active {
-  transform: translateY(1px) scale(0.99);
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    0 2px 8px rgba(37, 99, 235, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .sidebar-divider {
   border: none;
-  border-top: 1px solid #1f2937;
-  margin: 0.5rem 0 0.75rem;
+  border-top: 1px solid rgba(37, 99, 235, 0.2);
+  margin: var(--space-xl) 0;
 }
 
 /* ==== RESULTADOS / ROLLS ==== */
@@ -687,12 +723,16 @@ body {
 /* ==== RELAÇÕES ==== */
 
 .relation-label {
-  font-size: 0.8rem;
-  color: #9ca3af;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-soft);
+  margin-bottom: var(--space-xs);
 }
 
 .relation-row {
-  margin-top: 0.4rem;
+  margin-top: var(--space-sm);
 }
 
 .relation-name {
@@ -702,7 +742,8 @@ body {
 .relation-main {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: var(--space-sm);
+  padding: var(--space-sm) 0;
 }
 
 .relation-value {
@@ -778,16 +819,17 @@ body {
 /* ==== PERSONALIDADE (SLIDERS) ==== */
 
 .axis-row {
-  margin-top: 0.6rem;
+  margin-top: var(--space-md);
 }
 
 .axis-header-line {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.75rem;
-  color: #9ca3af;
-  margin-bottom: 0.2rem;
+  font-size: 0.85rem;  /* ✅ maior */
+  font-weight: 500;
+  color: #d1d5db;      /* ✅ mais legível */
+  margin-bottom: 0.3rem;
 }
 
 .axis-title {
@@ -796,9 +838,10 @@ body {
 }
 
 .axis-tag {
-  padding: 2px 8px;
+  padding: 3px 10px;   /* ✅ mais espaço */
   border-radius: 999px;
-  font-size: 0.7rem;
+  font-size: 0.8rem;   /* ✅ maior */
+  font-weight: 600;
   border: 1px solid #4b5563;
 }
 
@@ -828,8 +871,9 @@ body {
 
 .axis-end {
   width: 80px;
-  font-size: 0.7rem;
-  color: #6b7280;
+  font-size: 0.82rem;  /* ✅ maior */
+  font-weight: 500;
+  color: #9ca3af;      /* ✅ melhor contraste */
 }
 
 .axis-bar {
@@ -863,19 +907,20 @@ body {
 /* ==== RADAR DE ATRIBUTOS ==== */
 
 .radar-card {
-  margin-top: 0.75rem;
-  padding: 0.75rem;
-  border-radius: 0.75rem;
-  background: radial-gradient(circle at top, #020617, #020617);
-  border: 1px solid #1f2937;
+  margin-top: var(--space-xl);
+  padding: var(--space-lg);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(37, 99, 235, 0.2);
 }
 
 .radar-card h3 {
   font-size: 0.8rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #9ca3af;
-  margin-bottom: 0.4rem;
+  letter-spacing: 0.1em;
+  color: #93c5fd;
+  margin-bottom: var(--space-md);
 }
 
 .radar-wrapper {
@@ -893,25 +938,29 @@ body {
 /* ==== RESUMO DE JOGO ==== */
 
 .last-match-card {
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-xl);
+  border-bottom: 1px solid rgba(37, 99, 235, 0.15);
 }
 
 .last-match-main {
   display: flex;
-  gap: 1rem;
+  gap: var(--space-lg);
   align-items: center;
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin-top: var(--space-md);
+  margin-bottom: var(--space-md);
 }
 
 .last-match-rating {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0.6rem 0.9rem;
-  border-radius: 0.75rem;
-  background: radial-gradient(circle at top, #0f172a, #020617);
-  border: 1px solid #4b5563;
+  justify-content: center;
+  padding: var(--space-lg) var(--space-xl);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.95);
+  border: 2px solid rgba(37, 99, 235, 0.3);
+  min-width: 80px;
 }
 
 .last-match-rating-value {
@@ -1030,22 +1079,28 @@ body {
 .history-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-sm);
 }
 
 .history-row {
-  padding: 0.6rem 0.8rem;
-  border-radius: 10px;
-  border: 1px solid #1f2937;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: 12px;
+  border: 1px solid rgba(37, 99, 235, 0.2);
   background: rgba(15, 23, 42, 0.9);
-  font-size: 0.8rem;
+  font-size: 0.85rem;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.history-row:hover {
+  border-color: rgba(37, 99, 235, 0.4);
+  background: rgba(15, 23, 42, 0.95);
 }
 
 .history-main {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.25rem;
+  margin-bottom: var(--space-sm);
 }
 
 .history-week {
@@ -1060,12 +1115,81 @@ body {
 
 .history-extra {
   display: flex;
-  gap: 1rem;
-  color: #9ca3af;
-  margin-bottom: 0.2rem;
+  gap: var(--space-lg);
+  color: var(--text-soft);
+  margin-bottom: var(--space-sm);
+  font-size: 0.82rem;
 }
 
 .history-comment {
   margin: 0;
   color: #e5e7eb;
+}
+
+/* ==== MELHORIAS DE LEGIBILIDADE ==== */
+
+.story-text,
+.creation-subtitle,
+.week-option-button p,
+.backstory-content p,
+.social-text,
+.last-match-comment {
+  line-height: 1.65;  /* ✅ mais espaço entre linhas */
+}
+
+.sidebar p,
+.history-comment {
+  line-height: 1.6;
+}
+
+/* Melhorar contraste de textos descritivos */
+.week-option-button p,
+.backstory-content p {
+  color: #d1d5db;  /* ✅ mais brilhante que #9ca3af */
+}
+
+.week-option-button .effects-text,
+.backstory-content .effects-text {
+  color: #bfdbfe;  /* ✅ mais visível */
+  font-weight: 500;
+}
+
+/* ==== ESTADOS DISABLED ==== */
+
+.primary-button:disabled,
+.option-button:disabled,
+.week-option-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  pointer-events: none;
+}
+
+/* Feedback visual ao clicar (ripple effect simplificado) */
+.option-button:active::after,
+.primary-button:active::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.2);
+  animation: ripple 0.4s ease-out;
+  pointer-events: none;
+}
+
+@keyframes ripple {
+  from {
+    opacity: 1;
+    transform: scale(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+/* Melhorar feedback de hover nos cards de treino */
+.week-option-button:hover h3 {
+  color: #bfdbfe;
+  transition: color 0.2s ease;
 }

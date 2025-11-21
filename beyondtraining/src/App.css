@@ -225,7 +225,8 @@ body {
 
 .creation-card {
   width: 100%;
-  height: calc(100vh - 120px);
+  min-height: calc(100vh - 120px);
+  height: auto;
   margin: 0;
   padding: 28px 36px;
   border-radius: 20px;
@@ -518,7 +519,8 @@ body {
 .story {
   flex: 1;
   min-width: 0;
-  height: calc(100vh - 120px);
+  min-height: calc(100vh - 120px);
+  height: auto;
   padding: 28px 36px;
   border-radius: 20px;
 

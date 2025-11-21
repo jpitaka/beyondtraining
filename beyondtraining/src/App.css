@@ -1195,3 +1195,58 @@ body {
   color: #bfdbfe;
   transition: color 0.2s ease;
 }
+
+/* ==== CABEÇALHO DO JOGO (MINUTO / RESULTADO) ==== */
+
+.match-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+  gap: var(--space-lg);
+}
+
+.match-competition {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+
+.match-score {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.9),
+    rgba(37, 99, 235, 0.45)
+  );
+  box-shadow:
+    0 0 0 1px rgba(37, 99, 235, 0.5),
+    0 14px 30px rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.match-team {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #e5e7eb;
+}
+
+.match-score-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.match-minute {
+  margin-left: 0.4rem;
+  font-size: 0.8rem;
+  color: #bfdbfe;
+}

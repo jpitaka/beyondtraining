@@ -27,7 +27,7 @@ export const scenes = {
         id: "ficar_calado",
         label: "Fico calado e limito-me a acenar com a cabeça.",
         next: "calado",
-        effects: { morale: -5 },
+        effects: { morale: 0 },
         relationEffects: {
           coach: -2
         },

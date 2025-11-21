@@ -185,6 +185,8 @@ function App() {
 
   const scene = scenes[currentSceneId];
 
+  const [matchContext, setMatchContext] = useState(null);
+
   // carregar save
   useEffect(() => {
     try {
@@ -347,6 +349,23 @@ function App() {
             (matchStats.keyPasses || 0) + (impact.keyPasses || 0)
         }
       : matchStats;
+      // 👉 meta de jogo (minuto / golos) vinda da opção
+    const matchMeta = option.matchMeta || {};
+
+      if (matchMeta && (matchMeta.minuteIncrement || matchMeta.ourGoals || matchMeta.oppGoals)) {
+        setMatchContext((prev) => {
+          if (!prev) return prev;
+
+          const minuteIncrement = matchMeta.minuteIncrement ?? 0;
+
+          return {
+            ...prev,
+            minute: Math.min(prev.minute + minuteIncrement, 90),
+            ourGoals: prev.ourGoals + (matchMeta.ourGoals ?? 0),
+            oppGoals: prev.oppGoals + (matchMeta.oppGoals ?? 0)
+          };
+        });
+      }
 
     if (hadImpact) {
       setMatchStats(newMatchStats);
@@ -566,6 +585,14 @@ function App() {
       keyPasses: 0
     });
     setCurrentEvent(null);
+
+    setMatchContext({
+      competition: `Jornada ${week}`,
+      opponent: "Adversário da Semana", // placeholder por agora
+      minute: 0,
+      ourGoals: 0,
+      oppGoals: 0
+    });
 
     setCurrentSceneId("inicio");
     setScreen("game");
@@ -1112,6 +1139,29 @@ function App() {
           {renderSidebar()}
 
           <section className="story">
+            <section className="story">
+              {matchContext && (
+                <div className="match-header">
+                  <div className="match-competition">
+                    {matchContext.competition} · vs {matchContext.opponent}
+                  </div>
+
+                  <div className="match-score">
+                    <span className="match-team">Tu</span>
+                    <span className="match-score-value">
+                      {matchContext.ourGoals} - {matchContext.oppGoals}
+                    </span>
+                    <span className="match-team">Adversário</span>
+                    <span className="match-minute">{matchContext.minute}'</span>
+                  </div>
+                </div>
+              )}
+
+              <h2>{scene.title}</h2>
+              <p className="story-text">{scene.text}</p>
+              {/* resto do ecrã de jogo como já tens */}
+            </section>
+
             <h2>{scene.title}</h2>
             <p className="story-text">{scene.text}</p>
 
